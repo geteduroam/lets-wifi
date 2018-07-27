@@ -1,0 +1,17 @@
+{
+	"name": "uninett/lets-wifi",
+	"description": "Utility for provisioning 802.1x wifi clients",
+	"type": "project",
+	"license": "BSD-3-Clause",
+	"authors": [
+		{
+			"name": "Jørn Åne",
+			"email": "jorn.dejong@uninett.no"
+		}
+	],
+	"autoload": {
+		"files": ["src/_autoload.php"]
+	},
+	"require": {},
+	"require-dev": {}
+}

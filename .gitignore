@@ -1,0 +1,9 @@
+/composer.phar
+/data
+/phpdoc
+/php-cs-fixer-v2.phar
+/phpDocumentor.phar
+/psalm.phar
+/vendor
+/.php_cs.cache
+/.php_cs.cache

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<title>Create profile</title>
+
+<form method="post" action="generate.php">
+	<dl>
+		<dt>Username</dt>
+		<dd><input type="text" name="user"></dd>
+	</dl>
+	<dl>
+		<dt>Profile</dt>
+		<dd><select name="format">
+			<option>mobileconfig</option>
+			<option>eap-metadata-02</option>
+		</select></dd>
+	</dl>
+	<p><input type="submit" value="Generate certificate and profile"></p>
+</form>
