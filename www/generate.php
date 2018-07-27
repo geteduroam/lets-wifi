@@ -10,9 +10,10 @@ use Uninett\LetsWifi\X509\DN;
 use Uninett\LetsWifi\X509\KeyConfig;
 use Uninett\LetsWifi\X509\PrivateKey;
 use Uninett\LetsWifi\Generator\ProfileMetadata;
+use Uninett\LetsWifi\Generator\EapConfig\EapConfigGenerator;
 
 try {
-	if ( $_POST['format'] !== 'mobileconfig' ) {
+	if ( $_POST['format'] !== 'mobileconfig' && $_POST['format'] !== 'eap-metadata-02' ) {
 		header( 'Content-Type: text/plain', true, 400 );
 		die( "422 Unprocessable Entity\r\n\r\nIllegal format specified\r\n" );
 	}
@@ -56,21 +57,35 @@ try {
 	$p12Out = $x509->exportPKCS12WithPrivateKey( 'password' );
 
 	if ( $_POST['format'] === 'mobileconfig' ) {
+		header( 'Content-Disposition: attachment; filename="'. $_POST['user'] .'.mobileconfig"' );
 		$generator = new AppleMobileConfigGenerator(
 				new ProfileMetadata( 'eduroam demo', 'Demonstration of eduroam EAP-TLS generation and installation' ),
 				[
 					new EapTlsMethod(
 							$_POST['user'] . '@demo.eduroam.no', // outer identity
 							[$ca], // CA for server certificate
-							$p12Out // user credential
+							$p12Out, // user credential
+							'password'
 						),
 				]
 			);
+	} elseif ( $_POST['format'] === 'eap-metadata-02' ) {
+		header( 'Content-Disposition: attachment; filename="'. $_POST['user'] .'.xml"' );
+		$generator = new EapConfigGenerator(
+				new ProfileMetadata( 'eduroam demo', 'Demonstration of eduroam EAP-TLS generation and installation' ),
+				[
+						new EapTlsMethod(
+								$_POST['user'] . '@demo.eduroam.no', // outer identity
+								[$ca], // CA for server certificate
+								$p12Out, // user credential
+								'password'
+								),
+				]
+				);
 	}
 
 	$output = $generator->__toString();
 	header( 'Content-Type: ' . $generator->getContentType() );
-	header( 'Content-Disposition: attachment; filename="'. $_POST['user'] .'.mobileconfig"' );
 	echo $output;
 } catch ( \Exception $e ) {
 	header( 'Content-Type: text/plain', true, 500 );
