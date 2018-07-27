@@ -201,8 +201,14 @@ class AppleMobileConfigGenerator extends AbstractProfileGenerator
 		if ( null !== $pkcs12 ) {
 			$result .= ''
 				. "\r\n" . '		<dict>'
-				. "\r\n" . '			<key>Password</key>'
-				. "\r\n" . '			<string>password</string>'
+				. "\r\n";
+			if ( null !== $passphrase = $eap->getPKCS12PassPhrase() ) {
+				$result .= ''
+					. "\r\n" . '			<key>Password</key>'
+					. "\r\n" . '			<string>' . \htmlspecialchars( $passphrase ) . '</string>'
+					. "\r\n";
+			}
+			$result .= ''
 				. "\r\n" . '			<key>PayloadCertificateFileName</key>'
 				. "\r\n" . '			<string>' . $authentication->getCertUuid() . '.p12</string>'
 				. "\r\n" . '			<key>PayloadContent</key>'
