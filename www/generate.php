@@ -3,7 +3,6 @@
 // Quick 'n dirty proof of concept
 
 use Uninett\LetsWifi\Authentication\EapTlsMethod;
-use Uninett\LetsWifi\Generator\Apple\AppleMobileConfigGenerator;
 use Uninett\LetsWifi\X509\CA;
 use Uninett\LetsWifi\X509\CSR;
 use Uninett\LetsWifi\X509\DN;
@@ -11,9 +10,11 @@ use Uninett\LetsWifi\X509\KeyConfig;
 use Uninett\LetsWifi\X509\PrivateKey;
 use Uninett\LetsWifi\Generator\ProfileMetadata;
 use Uninett\LetsWifi\Generator\EapConfig\EapConfigGenerator;
+use Uninett\LetsWifi\Generator\Apple\AppleMobileConfigGenerator;
+use Uninett\LetsWifi\Generator\PKCS12\PKCS12ConfigGenerator;
 
 try {
-	if ( $_POST['format'] !== 'mobileconfig' && $_POST['format'] !== 'eap-metadata-02' ) {
+	if ( !in_array($_POST['format'], ['mobileconfig', 'eap-metadata', 'pkcs12']) ) {
 		header( 'Content-Type: text/plain', true, 400 );
 		die( "422 Unprocessable Entity\r\n\r\nIllegal format specified\r\n" );
 	}
@@ -25,7 +26,6 @@ try {
 	$dn = new DN(
 			[
 				'countryName' => 'NO',
-				//'stateOrProvinceName' => '',
 				'localityName' => 'Trondheim',
 				'organizationName' => 'UNINETT AS',
 				'commonName' => $_POST['user'] . '@demo.eduroam.no',
@@ -39,7 +39,7 @@ try {
 				'private_key_type' => OPENSSL_KEYTYPE_RSA,
 			]
 		) );
-	$csrConfigArgs = new KeyConfig( ['digest_alg' => 'sha256'] );
+	$csrConfigArgs = new KeyConfig( ['digest_alg' => 'sha256', 'x509_extensions' => 'client_req'] );
 	$csr = new CSR( $dn, $privkey, $csrConfigArgs );
 
 	$ca = new CA(
@@ -69,19 +69,32 @@ try {
 						),
 				]
 			);
-	} elseif ( $_POST['format'] === 'eap-metadata-02' ) {
+	} elseif ( $_POST['format'] === 'eap-metadata' ) {
 		header( 'Content-Disposition: attachment; filename="'. $_POST['user'] .'.xml"' );
 		$generator = new EapConfigGenerator(
 				new ProfileMetadata( 'eduroam demo', 'Demonstration of eduroam EAP-TLS generation and installation' ),
 				[
-						new EapTlsMethod(
-								$_POST['user'] . '@demo.eduroam.no', // outer identity
-								[$ca], // CA for server certificate
-								$p12Out, // user credential
-								'password'
-								),
+					new EapTlsMethod(
+							$_POST['user'] . '@demo.eduroam.no', // outer identity
+							[$ca], // CA for server certificate
+							$p12Out, // user credential
+							'password'
+						),
 				]
-				);
+			);
+	} elseif ( $_POST['format'] === 'pkcs12' ) {
+		header( 'Content-Disposition: attachment; filename="'. $_POST['user'] .'.p12"' );
+		$generator = new PKCS12ConfigGenerator(
+				new ProfileMetadata( 'eduroam demo', 'Demonstration of eduroam EAP-TLS generation and installation' ),
+				[
+					new EapTlsMethod(
+							$_POST['user'] . '@demo.eduroam.no', // outer identity
+							[$ca], // CA for server certificate
+							$p12Out, // user credential
+							'password'
+						),
+				]
+			);
 	}
 
 	$output = $generator->__toString();

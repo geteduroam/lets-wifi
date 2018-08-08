@@ -1,0 +1,19 @@
+[ req ]
+prompt                  = no
+distinguished_name      = dn
+
+[dn]
+
+[ ca_req ]
+basicConstraints        = critical, CA:TRUE
+keyUsage                = critical, cRLSign, digitalSignature, keyCertSign
+
+[ client_req ]
+basicConstraints        = critical, CA:FALSE
+keyUsage                = critical, digitalSignature, nonRepudiation, keyEncipherment
+extendedKeyUsage        = critical, clientAuth
+
+[ server_req ]
+basicConstraints        = critical, CA:FALSE
+keyUsage                = critical, digitalSignature, nonRepudiation, keyEncipherment, keyAgreement
+extendedKeyUsage        = critical, serverAuth

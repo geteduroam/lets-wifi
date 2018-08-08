@@ -70,10 +70,12 @@ class CA extends Certificate
 			throw new \RuntimeException( 'The private key for this CA is unknown, signing not possible' );
 		}
 
-		$configargsArray = [];
-		if ( null !== $configargs ) {
-			$configargsArray = $configargs->toArray();
-		}
+		$configArgsArray = null === $configargs
+			? []
+			: $configArgsArray = $configargs->toArray()
+			;
+
+		$configArgsArray['config'] = __DIR__ . \DIRECTORY_SEPARATOR . 'openssl.cnf';
 
 		$cwd = \getcwd();
 		if ( !\chdir( $this->workingDirectory ) ) {
@@ -86,7 +88,7 @@ class CA extends Certificate
 				$this->getResource(), /* CA certificate */
 				$private->getResource(), /* CA privkey */
 				$days, /* Days validity */
-				$configargsArray,
+				$configArgsArray,
 				$serial
 			);
 

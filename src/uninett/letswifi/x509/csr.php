@@ -61,11 +61,13 @@ class CSR implements ICSR
 		if ( null === $this->csrResource ) {
 			/** @var resource */
 			$privKey = $this->getPrivateKey()->getResource();
+			$configArgsArray = $this->getConfigArgs()->toArray();
+			$configArgsArray['config'] = __DIR__ . \DIRECTORY_SEPARATOR . 'openssl.cnf';
 			OpenSSLException::flushErrorMessages();
 			$csr = \openssl_csr_new(
 					$this->getDN()->getSubjectFields(),
 					$privKey,
-					$this->getConfigArgs()->toArray()
+					$configArgsArray
 					//$this->getConfigArgs()->getExtraAttribs() // @TODO what is the default value here?
 				);
 			if ( false === $csr ) {
