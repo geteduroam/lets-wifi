@@ -42,9 +42,18 @@ class Certificate extends PublicKey implements ICertificate
 			throw new \RuntimeException( 'Can only export PKCS12 with private key if a private key is set' );
 		}
 
+		$args = [];
+		$chain = $this->getChain();
+		if ( sizeof( $chain ) > 0 ) {
+			$args['extracerts'] = [];
+			foreach ( $chain as $cert ) {
+				$args['extracerts'][] = $cert->getResource();
+			}
+		}
+
 		$out = '';
 		OpenSSLException::flushErrorMessages();
-		if ( !\openssl_pkcs12_export( $this->getResource(), $out, $privKey->getResource(), $password ) ) {
+		if ( !\openssl_pkcs12_export( $this->getResource(), $out, $privKey->getResource(), $password, $args ) ) {
 			throw new OpenSSLException();
 		}
 

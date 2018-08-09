@@ -99,6 +99,6 @@ class CA extends Certificate
 			throw new \RuntimeException( 'Unable to chdir back from CA working directory' );
 		}
 
-		return new Certificate( $result, $csr->getPrivateKey() );
+		return new Certificate( $result, $csr->getPrivateKey(), array_merge( [$this], $this->getChain() ) );
 	}
 }
