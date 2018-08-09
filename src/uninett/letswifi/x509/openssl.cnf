@@ -5,15 +5,21 @@ distinguished_name      = dn
 [dn]
 
 [ ca_req ]
-basicConstraints        = critical, CA:TRUE
-keyUsage                = critical, cRLSign, digitalSignature, keyCertSign
+subjectKeyIdentifier    = hash
+authorityKeyIdentifier  = keyid:always, issuer:always
+basicConstraints        = CA:TRUE
+keyUsage                = cRLSign, digitalSignature, keyCertSign
 
 [ client_req ]
-basicConstraints        = critical, CA:FALSE
-keyUsage                = critical, digitalSignature, nonRepudiation, keyEncipherment
-extendedKeyUsage        = critical, clientAuth
+subjectKeyIdentifier    = hash
+authorityKeyIdentifier  = keyid:always, issuer:always
+basicConstraints        = CA:FALSE
+keyUsage                = digitalSignature, nonRepudiation, keyEncipherment
+extendedKeyUsage        = clientAuth
 
 [ server_req ]
-basicConstraints        = critical, CA:FALSE
-keyUsage                = critical, digitalSignature, nonRepudiation, keyEncipherment, keyAgreement
-extendedKeyUsage        = critical, serverAuth
+subjectKeyIdentifier    = hash
+authorityKeyIdentifier  = keyid:always, issuer:always
+basicConstraints        = CA:FALSE
+keyUsage                = digitalSignature, nonRepudiation, keyEncipherment, keyAgreement
+extendedKeyUsage        = serverAuth
