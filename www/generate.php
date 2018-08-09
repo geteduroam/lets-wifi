@@ -29,7 +29,6 @@ try {
 				'localityName' => 'Trondheim',
 				'organizationName' => 'UNINETT AS',
 				'commonName' => $_POST['user'] . '@demo.eduroam.no',
-				'emailAddress' => 'eduroam@uninett.no'
 			]
 		);
 
