@@ -44,7 +44,7 @@ class Certificate extends PublicKey implements ICertificate
 
 		$args = [];
 		$chain = $this->getChain();
-		if ( sizeof( $chain ) > 0 ) {
+		if ( \count( $chain ) > 0 ) {
 			$args['extracerts'] = [];
 			foreach ( $chain as $cert ) {
 				$args['extracerts'][] = $cert->getResource();
