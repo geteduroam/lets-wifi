@@ -12,6 +12,8 @@
 	"autoload": {
 		"files": ["src/_autoload.php"]
 	},
-	"require": {},
+	"require": {
+		"paragonie/paseto": "^1.0"
+	},
 	"require-dev": {}
 }
