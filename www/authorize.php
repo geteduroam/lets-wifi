@@ -1,6 +1,10 @@
 <?php
+$baseUrl = ( empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] === 'off' ? 'http' : 'https' )
+	. '://'
+	. $_SERVER['HTTP_HOST'];
 session_start();
 if (!isset($_SESSION['oauth_user'])) {
+	$_SESSION['redirect'] = $baseUrl . '/authorize.php';
 	header('Location: /oauth.php');
 	exit;
 }
@@ -32,9 +36,6 @@ $clients = [
 		'scope' => ['eap-metadata']
 	],
 ];
-$baseUrl = ( empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] === 'off' ? 'http' : 'https' )
-	. '://'
-	. $_SERVER['HTTP_HOST'];
 
 header( 'Cache-Control: no-store' );
 header( 'Pragma: no-cache' );

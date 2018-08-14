@@ -25,7 +25,12 @@ if (!isset($_GET['code'])) {
 		]);
 		$resourceOwner = $provider->getResourceOwner($accessToken);
 		$_SESSION['oauth_user'] = $resourceOwner->toArray()['user']['userid'];
-		header('Location: /');
+		$redirect = '/';
+		if ( isset( $_SESSION['redirect'] ) ) {
+			$redirect = $_SESSION['redirect'];
+			unset $_SESSION['redirect'];
+		}
+		header('Location: ' . $redirect);
 	} catch (\League\OAuth2\Client\Provider\Exception\IdentityProviderException $e) {
 		// Failed to get the access token or user details.
 		exit($e->getMessage());

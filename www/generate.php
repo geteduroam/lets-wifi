@@ -1,5 +1,10 @@
 <?php require implode( DIRECTORY_SEPARATOR, [dirname( __DIR__ ), 'src', '_autoload.php'] );
 
+session_start();
+if ($_POST['user'] !== $_SESSION['oauth_user']) {
+	header('Content-Type: text/plain', true, 403);
+	die("403 Forbidden\r\n\r\nIllegal user specified\r\n");
+}
 // Quick 'n dirty proof of concept
 
 use Uninett\LetsWifi\Authentication\EapTlsMethod;

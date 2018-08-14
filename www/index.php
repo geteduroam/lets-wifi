@@ -1,6 +1,10 @@
 <?php
+$baseUrl = ( empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] === 'off' ? 'http' : 'https' )
+	. '://'
+	. $_SERVER['HTTP_HOST'];
 session_start();
 if (!isset($_SESSION['oauth_user'])) {
+	$_SESSION['redirect'] = $baseUrl . '/';
 	header('Location: /oauth.php');
 	exit;
 }
@@ -11,7 +15,7 @@ if (!isset($_SESSION['oauth_user'])) {
 <form method="post" action="generate.php">
 	<dl>
 		<dt>Username</dt>
-		<dd><input type="text" name="user"></dd>
+		<dd><input type="text" name="user" value="<?= $_SESSION['oauth_user'] ?>" readonly></dd>
 	</dl>
 	<dl>
 		<dt>Profile</dt>

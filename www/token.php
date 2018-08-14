@@ -67,11 +67,13 @@ try {
 	header( 'Content-Type: text/plain', true, 422 );
 	die( "422 Unprocessable Entity\r\n\r\nCannot process token\r\n\r\n" );
 }
+
 header( 'Content-Type: text/plain', true, 500 );
 if ($token->get( 'code_challenge_method' ) !== 'S256') {
 	header( 'Content-Type: text/plain', true, 422 );
 	die( "422 Unprocessable Entity\r\n\r\nToken has no valid code_challenge_method\r\n\r\n" );
 }
+
 // For this PoC we won't be using constant time
 $challengeB64 = $token->get( 'code_challenge' );
 $verifierB64 = $_GET['code_verifier'];
