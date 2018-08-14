@@ -13,6 +13,7 @@
 		"files": ["src/_autoload.php"]
 	},
 	"require": {
+		"league/oauth2-client": "^2.3",
 		"paragonie/paseto": "^1.0"
 	},
 	"require-dev": {}

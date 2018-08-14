@@ -1,4 +1,10 @@
 <?php
+session_start();
+if (!isset($_SESSION['oauth_user'])) {
+	header('Location: /oauth.php');
+	exit;
+}
+
 use ParagonIE\Paseto\Builder;
 use ParagonIE\Paseto\Parser;
 use ParagonIE\Paseto\Purpose;

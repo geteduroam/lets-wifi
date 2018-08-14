@@ -1,4 +1,10 @@
-<!DOCTYPE html>
+<?php
+session_start();
+if (!isset($_SESSION['oauth_user'])) {
+	header('Location: /oauth.php');
+	exit;
+}
+?><!DOCTYPE html>
 <html lang="en">
 <title>Create profile</title>
 
