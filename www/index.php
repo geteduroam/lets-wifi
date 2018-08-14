@@ -4,7 +4,7 @@ $baseUrl = ( empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] === 'off' ? 'http' : 
 	. $_SERVER['HTTP_HOST'];
 session_start();
 if (!isset($_SESSION['oauth_user'])) {
-	$_SESSION['redirect'] = $baseUrl . '/';
+	$_SESSION['redirect'] = $baseUrl . $_SERVER['REQUEST_URI'];
 	header('Location: /oauth.php');
 	exit;
 }

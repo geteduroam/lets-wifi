@@ -28,7 +28,7 @@ if (!isset($_GET['code'])) {
 		$redirect = '/';
 		if ( isset( $_SESSION['redirect'] ) ) {
 			$redirect = $_SESSION['redirect'];
-			unset $_SESSION['redirect'];
+			unset($_SESSION['redirect']);
 		}
 		header('Location: ' . $redirect);
 	} catch (\League\OAuth2\Client\Provider\Exception\IdentityProviderException $e) {
