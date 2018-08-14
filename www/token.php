@@ -1,4 +1,5 @@
 <?php
+use ParagonIE\Paseto\Exception\PasetoException;
 use ParagonIE\Paseto\Builder;
 use ParagonIE\Paseto\Parser;
 use ParagonIE\Paseto\Purpose;
