@@ -1,12 +1,5 @@
 <?php require implode( DIRECTORY_SEPARATOR, [dirname( __DIR__ ), 'src', '_autoload.php'] );
 
-session_start();
-if ($_POST['user'] !== $_SESSION['oauth_user']) {
-	header('Content-Type: text/plain', true, 403);
-	die("403 Forbidden\r\n\r\nIllegal user specified\r\n");
-}
-// Quick 'n dirty proof of concept
-
 use Uninett\LetsWifi\Authentication\EapTlsMethod;
 use Uninett\LetsWifi\X509\CA;
 use Uninett\LetsWifi\X509\CSR;
@@ -17,6 +10,56 @@ use Uninett\LetsWifi\Generator\ProfileMetadata;
 use Uninett\LetsWifi\Generator\EapConfig\EapConfigGenerator;
 use Uninett\LetsWifi\Generator\Apple\AppleMobileConfigGenerator;
 use Uninett\LetsWifi\Generator\PKCS12\PKCS12ConfigGenerator;
+
+use ParagonIE\Paseto\Exception\PasetoException;
+use ParagonIE\Paseto\Parser;
+use ParagonIE\Paseto\Purpose;
+use ParagonIE\Paseto\Keys\SymmetricKey;
+use ParagonIE\Paseto\ProtocolCollection;
+use ParagonIE\Paseto\Rules\{
+	ForAudience,
+	IssuedBy,
+	NotExpired
+};
+
+// Quick 'n dirty proof of concept
+
+if ( isset( $_SERVER['HTTP_AUTHORIZATION'] ) ) {
+	$authorization = $_SERVER['HTTP_AUTHORIZATION'];
+	if ( substr( $authorization, 0, 7 ) !== 'Bearer ' ) {
+		header('Content-Type: text/plain', true, 422);
+		die("422 Forbidden\r\n\r\nIllegal authorization header\r\n");
+	}
+	$tokenString = substr( $authorization, 7 );
+
+	$sharedKey = new SymmetricKey( 'YENuGQd3avOLdM8UBxPhRZRxhmQxXR5g' ); // TODO: Give random BITS!
+
+	$parser = ( new Parser() )
+		->setKey( $sharedKey )
+		->addRule( new NotExpired )
+		->addRule( new IssuedBy( 'lets-wifi-token' ) )
+		->addRule( new ForAudience( 'lets-wifi-generator' ) )
+		->setPurpose( Purpose::local() )
+		->setAllowedVersions( ProtocolCollection::v2() );
+
+	try {
+		$token = $parser->parse( $_GET['code'] );
+	} catch ( PasetoException $ex ) {
+		header( 'Content-Type: text/plain', true, 422 );
+		die( "422 Unprocessable Entity\r\n\r\nCannot process token\r\n\r\n" );
+	}
+
+	if ( $_POST['user'] !== $token->getSubject() ) {
+		header( 'Content-Type: text/plain', true, 403 );
+		die( "403 Forbidden\r\n\r\nIllegal user specified\r\n" );
+	}
+} else {
+	session_start();
+	if ( $_POST['user'] !== $_SESSION['oauth_user'] ) {
+		header( 'Content-Type: text/plain', true, 403 );
+		die( "403 Forbidden\r\n\r\nIllegal user specified\r\n" );
+	}
+}
 
 try {
 	if ( !in_array($_POST['format'], ['mobileconfig', 'eap-metadata', 'pkcs12']) ) {

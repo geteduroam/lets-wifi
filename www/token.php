@@ -96,7 +96,7 @@ $newToken = ( new Builder() )
 		( new DateTime() )->add( new DateInterval( 'PT1H' ) )
 	)
 	->setClaims( [
-		'iss' => 'lets-wifi-issuer',
+		'iss' => 'lets-wifi-token',
 		'aud' => 'lets-wifi-generator',
 		'sub' => $token->getSubject(),
 	] );
