@@ -55,6 +55,7 @@ if ( isset( $_SERVER['HTTP_AUTHORIZATION'] ) ) {
 	}
 
 	$user = $token->getSubject();
+	$format = $_REQUEST['format'];
 } elseif ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
 	session_start();
 	if ( $_POST['user'] !== $_SESSION['oauth_user'] ) {
@@ -68,6 +69,7 @@ if ( isset( $_SERVER['HTTP_AUTHORIZATION'] ) ) {
 	}
 
 	$user = $_POST['user'];
+	$format = $_POST['format'];
 } else {
 	header( 'Content-Type: text/plain', true, 422 );
 	die( "422 Unprocessable Entity\r\n\r\nRequest must be POST and/or have a bearer token\r\n" );
