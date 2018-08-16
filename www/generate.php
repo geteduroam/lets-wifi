@@ -1,4 +1,4 @@
-<?php require implode( DIRECTORY_SEPARATOR, [dirname( __DIR__ ), 'src', '_autoload.php'] );
+<?php require implode( DIRECTORY_SEPARATOR, [dirname( __DIR__ ), 'vendor', 'autoload.php'] );
 
 use Uninett\LetsWifi\Authentication\EapTlsMethod;
 use Uninett\LetsWifi\X509\CA;
