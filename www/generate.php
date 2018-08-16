@@ -7,9 +7,10 @@ use Uninett\LetsWifi\X509\DN;
 use Uninett\LetsWifi\X509\KeyConfig;
 use Uninett\LetsWifi\X509\PrivateKey;
 use Uninett\LetsWifi\Generator\ProfileMetadata;
-use Uninett\LetsWifi\Generator\EapConfig\EapConfigGenerator;
 use Uninett\LetsWifi\Generator\Apple\AppleMobileConfigGenerator;
+use Uninett\LetsWifi\Generator\EapConfig\EapConfigGenerator;
 use Uninett\LetsWifi\Generator\PKCS12\PKCS12ConfigGenerator;
+use Uninett\LetsWifi\Generator\Pem\PemConfigGenerator;
 
 use ParagonIE\Paseto\Exception\PasetoException;
 use ParagonIE\Paseto\Parser;
@@ -63,7 +64,7 @@ if ( isset( $_SERVER['HTTP_AUTHORIZATION'] ) ) {
 		die( "403 Forbidden\r\n\r\nIllegal user specified\r\n" );
 	}
 
-	if ( !in_array($_POST['format'], ['mobileconfig', 'eap-metadata', 'pkcs12']) ) {
+	if ( !in_array($_POST['format'], ['mobileconfig', 'eap-metadata', 'pkcs12', 'pem']) ) {
 		header( 'Content-Type: text/plain', true, 422 );
 		die( "422 Unprocessable Entity\r\n\r\nIllegal format specified\r\n" );
 	}
@@ -142,6 +143,19 @@ try {
 	} elseif ( $format === 'pkcs12' ) {
 		header( 'Content-Disposition: attachment; filename="'. $user .'.p12"' );
 		$generator = new PKCS12ConfigGenerator(
+				new ProfileMetadata( 'eduroam demo', 'Demonstration of eduroam EAP-TLS generation and installation' ),
+				[
+					new EapTlsMethod(
+							$user . '@demo.eduroam.no', // outer identity
+							[$ca], // CA for server certificate
+							$p12Out, // user credential
+							'password'
+						),
+				]
+			);
+	} elseif ( $format === 'pem' ) {
+		header( 'Content-Disposition: attachment; filename="'. $user .'.pem"' );
+		$generator = new PemConfigGenerator(
 				new ProfileMetadata( 'eduroam demo', 'Demonstration of eduroam EAP-TLS generation and installation' ),
 				[
 					new EapTlsMethod(

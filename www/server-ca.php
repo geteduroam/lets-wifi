@@ -71,7 +71,7 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
 		$privPem = $x509->getPrivateKey()->exportPEMWithoutPassword();
 		$pubPem = $x509->getPEMBytes( false );
 		header( 'Content-Type: text/plain', true );
-		echo "${privPem}${pubPem}";
+		echo "# Private key\n${privPem}# Client certificate\n${pubPem}# Chain\n";
 		foreach ( $x509->getChain() as $c ) {
 			echo $c->getPEMBytes( false );
 		}

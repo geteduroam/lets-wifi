@@ -23,6 +23,7 @@ if (!isset($_SESSION['oauth_user'])) {
 			<option>mobileconfig</option>
 			<option>eap-metadata</option>
 			<option>pkcs12</option>
+			<option>pem</option>
 		</select></dd>
 	</dl>
 	<p><input type="submit" value="Generate certificate and profile"></p>
