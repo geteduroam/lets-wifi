@@ -12,7 +12,7 @@ use ParagonIE\Paseto\Rules\{
 	NotExpired
 };
 
-require implode(DIRECTORY_SEPARATOR, [dirname(__DIR__), 'vendor', 'autoload.php']);
+require implode( DIRECTORY_SEPARATOR, [dirname( __DIR__ ), 'vendor', 'autoload.php'] );
 
 // Very very proof of concept, NO NOT USE IN PRODUCTION
 
@@ -26,7 +26,7 @@ $clients = [
 		'scope' => ['eap-metadata']
 	],
 ];
-$baseUrl = ( empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] === 'off' ? 'http' : 'https' )
+$baseUrl = ( empty( $_SERVER['HTTPS'] ) || $_SERVER['HTTPS'] === 'off' ? 'http' : 'https' )
 	. '://'
 	. $_SERVER['HTTP_HOST'];
 
@@ -34,7 +34,7 @@ header( 'Cache-Control: no-store' );
 header( 'Pragma: no-cache' );
 
 foreach( ['grant_type', 'code', 'redirect_uri', 'client_id', 'code_verifier'] as $key ) {
-	if ( !isset($_GET[$key] ) ) {
+	if ( !isset( $_GET[$key] ) ) {
 		header( 'Content-Type: text/plain', true, 422 );
 		die( "422 Unprocessable Entity\r\n\r\nMissing GET parameter '$key'\r\n\r\n" );
 	}
@@ -68,7 +68,7 @@ try {
 	die( "422 Unprocessable Entity\r\n\r\nCannot process token\r\n\r\n" );
 }
 
-if ($token->get( 'code_challenge_method' ) !== 'S256') {
+if ($token->get( 'code_challenge_method' ) !== 'S256' ) {
 	header( 'Content-Type: text/plain', true, 422 );
 	die( "422 Unprocessable Entity\r\n\r\nToken has no valid code_challenge_method\r\n\r\n" );
 }
@@ -98,6 +98,7 @@ $newToken = ( new Builder() )
 		'iss' => 'lets-wifi-token',
 		'aud' => 'lets-wifi-generator',
 		'sub' => $token->getSubject(),
+		'scope' => $token->get( 'scope' ),
 	] );
 
 echo json_encode(

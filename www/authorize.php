@@ -84,6 +84,7 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
 			'iss' => 'lets-wifi-auth',
 			'aud' => 'lets-wifi-issuer',
 			'sub' => $user,
+			'scope' => $_GET['scope'],
 			'code_challenge_method' => $_GET['code_challenge_method'],
 			'code_challenge' => $_GET['code_challenge'],
 		] );

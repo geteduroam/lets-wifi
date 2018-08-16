@@ -49,23 +49,28 @@ if ( isset( $_SERVER['HTTP_AUTHORIZATION'] ) ) {
 		die( "422 Unprocessable Entity\r\n\r\nCannot process token\r\n\r\n" );
 	}
 
-	if ( $_POST['user'] !== $token->getSubject() ) {
-		header( 'Content-Type: text/plain', true, 403 );
-		die( "403 Forbidden\r\n\r\nIllegal user specified\r\n" );
+	if ( !in_array( $_POST['format'], explode( ' ', $token->get( 'scope' ) ) ) ) {
+		header( 'Content-Type: text/plain', true, 400 );
+		die( "422 Unprocessable Entity\r\n\r\nIllegal format specified\r\n" );
 	}
+
+	$user = $token->getSubject();
 } else {
 	session_start();
 	if ( $_POST['user'] !== $_SESSION['oauth_user'] ) {
 		header( 'Content-Type: text/plain', true, 403 );
 		die( "403 Forbidden\r\n\r\nIllegal user specified\r\n" );
 	}
-}
 
-try {
 	if ( !in_array($_POST['format'], ['mobileconfig', 'eap-metadata', 'pkcs12']) ) {
 		header( 'Content-Type: text/plain', true, 400 );
 		die( "422 Unprocessable Entity\r\n\r\nIllegal format specified\r\n" );
 	}
+
+	$user = $_POST['user'];
+}
+
+try {
 	if ( preg_match( '/^[a-z0-9]$/', $_POST['user'] ) ) {
 		header( 'Content-Type: text/plain', true, 403 );
 		die( "403 Forbidden\r\n\r\nIllegal user specified\r\n" );
@@ -76,7 +81,7 @@ try {
 				'countryName' => 'NO',
 				'localityName' => 'Trondheim',
 				'organizationName' => 'UNINETT AS',
-				'commonName' => $_POST['user'] . '@demo.eduroam.no',
+				'commonName' => $user . '@demo.eduroam.no',
 			]
 		);
 
@@ -103,39 +108,39 @@ try {
 
 	$p12Out = $x509->exportPKCS12WithPrivateKey( 'password' );
 
-	if ( $_POST['format'] === 'mobileconfig' ) {
-		header( 'Content-Disposition: attachment; filename="'. $_POST['user'] .'.mobileconfig"' );
+	if ( $format === 'mobileconfig' ) {
+		header( 'Content-Disposition: attachment; filename="'. $user .'.mobileconfig"' );
 		$generator = new AppleMobileConfigGenerator(
 				new ProfileMetadata( 'eduroam demo', 'Demonstration of eduroam EAP-TLS generation and installation' ),
 				[
 					new EapTlsMethod(
-							$_POST['user'] . '@demo.eduroam.no', // outer identity
+							$user . '@demo.eduroam.no', // outer identity
 							[$ca], // CA for server certificate
 							$p12Out, // user credential
 							'password'
 						),
 				]
 			);
-	} elseif ( $_POST['format'] === 'eap-metadata' ) {
-		header( 'Content-Disposition: attachment; filename="'. $_POST['user'] .'.xml"' );
+	} elseif ( $format === 'eap-metadata' ) {
+		header( 'Content-Disposition: attachment; filename="'. $user .'.xml"' );
 		$generator = new EapConfigGenerator(
 				new ProfileMetadata( 'eduroam demo', 'Demonstration of eduroam EAP-TLS generation and installation' ),
 				[
 					new EapTlsMethod(
-							$_POST['user'] . '@demo.eduroam.no', // outer identity
+							$user . '@demo.eduroam.no', // outer identity
 							[$ca], // CA for server certificate
 							$p12Out, // user credential
 							'password'
 						),
 				]
 			);
-	} elseif ( $_POST['format'] === 'pkcs12' ) {
-		header( 'Content-Disposition: attachment; filename="'. $_POST['user'] .'.p12"' );
+	} elseif ( $format === 'pkcs12' ) {
+		header( 'Content-Disposition: attachment; filename="'. $user .'.p12"' );
 		$generator = new PKCS12ConfigGenerator(
 				new ProfileMetadata( 'eduroam demo', 'Demonstration of eduroam EAP-TLS generation and installation' ),
 				[
 					new EapTlsMethod(
-							$_POST['user'] . '@demo.eduroam.no', // outer identity
+							$user . '@demo.eduroam.no', // outer identity
 							[$ca], // CA for server certificate
 							$p12Out, // user credential
 							'password'
