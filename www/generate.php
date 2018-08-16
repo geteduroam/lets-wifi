@@ -43,19 +43,19 @@ if ( isset( $_SERVER['HTTP_AUTHORIZATION'] ) ) {
 		->setAllowedVersions( ProtocolCollection::v2() );
 
 	try {
-		$token = $parser->parse( $_GET['code'] );
+		$token = $parser->parse( $tokenString );
 	} catch ( PasetoException $ex ) {
 		header( 'Content-Type: text/plain', true, 422 );
 		die( "422 Unprocessable Entity\r\n\r\nCannot process token\r\n\r\n" );
 	}
 
-	if ( !in_array( $_POST['format'], explode( ' ', $token->get( 'scope' ) ) ) ) {
+	if ( !in_array( $_REQUEST['format'], explode( ' ', $token->get( 'scope' ) ) ) ) {
 		header( 'Content-Type: text/plain', true, 400 );
 		die( "422 Unprocessable Entity\r\n\r\nIllegal format specified\r\n" );
 	}
 
 	$user = $token->getSubject();
-} else {
+} elseif ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
 	session_start();
 	if ( $_POST['user'] !== $_SESSION['oauth_user'] ) {
 		header( 'Content-Type: text/plain', true, 403 );
