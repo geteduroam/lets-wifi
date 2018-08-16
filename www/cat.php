@@ -8,7 +8,7 @@ $baseUrl = ( empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] === 'off' ? 'http' : 
 echo implode("\n", str_split(base64_encode(json_encode([
 	'authorization_endpoint' => $baseUrl . '/authorize.php',
 	'token_endpoint' => $baseUrl . '/token.php',
-	'generator_endpoint' => $baseUrl . '/generator.php',
+	'generator_endpoint' => $baseUrl . '/generate.php',
 ])), 64));
 ?>
 
