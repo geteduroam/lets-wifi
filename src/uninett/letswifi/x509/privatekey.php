@@ -65,7 +65,7 @@ class PrivateKey extends AbstractKeyResource implements IPrivateKey
 	{
 		$out = '';
 		OpenSSLException::flushErrorMessages();
-		if ( !\openssl_pkey_export( $this->getResource(), $out, '' ) ) {
+		if ( !\openssl_pkey_export( $this->getResource(), $out, null ) ) {
 			throw new OpenSSLException();
 		}
 
