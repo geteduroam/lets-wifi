@@ -18,13 +18,13 @@ class Certificate extends PublicKey implements ICertificate
 	private $chain;
 
 	/**
-	 * @param mixed          $key        An existing resource, or a PEM formatted key
+	 * @param mixed          $pubKey     An existing resource, or a certificate PEM
 	 * @param IPrivateKey    $privateKey The private key for this certificate
 	 * @param ICertificate[] $chain      Chain for this certificate
 	 */
-	public function __construct( $key, ?IPrivateKey $privateKey = null, ?array $chain = [] )
+	public function __construct( $pubKey, ?IPrivateKey $privateKey = null, ?array $chain = [] )
 	{
-		parent::__construct( self::keyToResource( $key ) );
+		parent::__construct( self::keyToResource( $pubKey ) );
 
 		if ( null === $chain ) {
 			$chain = [];

@@ -17,4 +17,13 @@ interface IPKCS12
 	 * Output the PKCS12 store
 	 */
 	public function getBytes(): string;
+
+	/**
+	 * Get the certificate from this container (including private key and chain)
+	 *
+	 * @param string $password The password the container is encrypted with
+	 *
+	 * @return ICertificate The certificate
+	 */
+	public function getCertificate( ?string $password ): ICertificate;
 }

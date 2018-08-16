@@ -29,4 +29,27 @@ class PKCS12 implements IPKCS12
 	{
 		return $this->bytes;
 	}
+
+	/** {@inheritdoc} */
+	public function getCertificate( ?string $password ): ICertificate
+	{
+		OpenSSLException::flushErrorMessages();
+		$certs = [];
+		$result = \openssl_pkcs12_read( $this->getBytes(), $certs, $password ?? '' );
+		if ( false === $result ) {
+			throw new OpenSSLException();
+		}
+
+		$chain = [];
+		foreach ( $certs['extracerts'] as $cert ) {
+			$chain[] = new Certificate( $cert );
+		}
+
+		$pkey = \array_key_exists( 'pkey', $certs )
+			? PrivateKey::import( $certs['pkey'] )
+			: null
+			;
+
+		return new Certificate( $certs['cert'], $pkey, $chain );
+	}
 }
