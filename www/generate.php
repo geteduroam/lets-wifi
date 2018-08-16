@@ -68,6 +68,9 @@ if ( isset( $_SERVER['HTTP_AUTHORIZATION'] ) ) {
 	}
 
 	$user = $_POST['user'];
+} else {
+	header( 'Content-Type: text/plain', true, 422 );
+	die( "422 Unprocessable Entity\r\n\r\nRequest must be POST and/or have a bearer token\r\n" );
 }
 
 try {
