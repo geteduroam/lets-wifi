@@ -95,19 +95,9 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
 					'code' => $token->toString(), 'state' => $_GET['state']
 				]
 			);
-		header( 'Content-Type: text/plain', true, 500 );
-		echo "$url\r\n\r\n";
-		echo $baseUrl . '/token.php?' . http_build_query(
-				[
-					'grant_type' => 'authorization_code',
-					'code' => $token->toString(),
-					'redirect_uri' => $_GET['redirect_uri'],
-					'client_id' => $_GET['client_id'],
-					'code_verifier' => 'dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk',
-				]
-			);
-		exit;
-		header( 'Location: ' . $url);
+		header( 'Content-Type: text/plain' );
+		header( "Location: $url", true, 302 );
+		die( "$url\r\n\r\n" );
 	}
 }
 ?><!DOCTYPE html>
