@@ -73,32 +73,40 @@ if ( !in_array( $_GET['scope'], $clients[$_GET['client_id']]['scope'], true ) ) 
 }
 
 if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
-	$token = ( new Builder() )
-		->setKey( $sharedKey )
-		->setVersion( new Version2() )
-		->setPurpose( Purpose::local() )
-		->setExpiration(
-			( new DateTime() )->add( new DateInterval( 'PT10M' ) )
-		)
-		->setClaims( [
-			'iss' => 'lets-wifi-auth',
-			'aud' => 'lets-wifi-issuer',
-			'sub' => $user,
-			'scope' => $_GET['scope'],
-			'code_challenge_method' => $_GET['code_challenge_method'],
-			'code_challenge' => $_GET['code_challenge'],
-		] );
-
 	if ( isset( $_POST['approve'] ) && $_POST['approve'] === '1' ) {
+		$token = ( new Builder() )
+			->setKey( $sharedKey )
+			->setVersion( new Version2() )
+			->setPurpose( Purpose::local() )
+			->setExpiration(
+				( new DateTime() )->add( new DateInterval( 'PT10M' ) )
+			)
+			->setClaims( [
+				'iss' => 'lets-wifi-auth',
+				'aud' => 'lets-wifi-issuer',
+				'sub' => $user,
+				'scope' => $_GET['scope'],
+				'code_challenge_method' => $_GET['code_challenge_method'],
+				'code_challenge' => $_GET['code_challenge'],
+			] );
+
 		$url = $_GET['redirect_uri'] . '?' . http_build_query(
 				[
-					'code' => $token->toString(), 'state' => $_GET['state']
+					'code' => $token->toString(),
+					'state' => $_GET['state'],
 				]
 			);
-		header( 'Content-Type: text/plain' );
-		header( "Location: $url", true, 302 );
-		die( "$url\r\n\r\n" );
+	} else {
+		$url = $_GET['redirect_uri'] . '?' . http_build_query(
+				[
+					'error' => 'access_denied',
+					'state' => $_GET['state'],
+				]
+			);
 	}
+	header( 'Content-Type: text/plain' );
+	header( "Location: $url", true, 302 );
+	die( "$url\r\n\r\n" );
 }
 ?><!DOCTYPE html>
 <title>Authorize eduroam client</title>
