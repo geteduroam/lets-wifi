@@ -46,11 +46,11 @@ if ( isset( $_SERVER['HTTP_AUTHORIZATION'] ) ) {
 		$token = $parser->parse( $tokenString );
 	} catch ( PasetoException $ex ) {
 		header( 'Content-Type: text/plain', true, 422 );
-		die( "422 Unprocessable Entity\r\n\r\nCannot process token\r\n\r\n" );
+		die( "422 Unprocessable Entity\r\n\r\nCannot process token\r\n" );
 	}
 
 	if ( !in_array( $_REQUEST['format'], explode( ' ', $token->get( 'scope' ) ) ) ) {
-		header( 'Content-Type: text/plain', true, 400 );
+		header( 'Content-Type: text/plain', true, 422 );
 		die( "422 Unprocessable Entity\r\n\r\nIllegal format specified\r\n" );
 	}
 
@@ -63,7 +63,7 @@ if ( isset( $_SERVER['HTTP_AUTHORIZATION'] ) ) {
 	}
 
 	if ( !in_array($_POST['format'], ['mobileconfig', 'eap-metadata', 'pkcs12']) ) {
-		header( 'Content-Type: text/plain', true, 400 );
+		header( 'Content-Type: text/plain', true, 422 );
 		die( "422 Unprocessable Entity\r\n\r\nIllegal format specified\r\n" );
 	}
 
@@ -150,6 +150,8 @@ try {
 						),
 				]
 			);
+	} else {
+		throw new \DomainException("Unknown format: $format");
 	}
 
 	$output = $generator->__toString();
