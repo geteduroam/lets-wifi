@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /**
- * UUID.
+ * UUID
  *
  * Copyright: 2018, Uninett AS
  * SPDX-License-Identifier: BSD-3-Clause

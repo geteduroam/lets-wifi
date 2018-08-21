@@ -1,4 +1,5 @@
-<?php
+<?php require implode(DIRECTORY_SEPARATOR, [dirname(__DIR__), 'vendor', 'autoload.php']);
+
 $baseUrl = ( empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] === 'off' ? 'http' : 'https' )
 	. '://'
 	. $_SERVER['HTTP_HOST'];
@@ -21,21 +22,16 @@ use ParagonIE\Paseto\Rules\{
 	NotExpired
 };
 
-require implode(DIRECTORY_SEPARATOR, [dirname(__DIR__), 'vendor', 'autoload.php']);
+use Uninett\LetsWifi\LetsWifiApp;
 
 // Very very proof of concept, NO NOT USE IN PRODUCTION
 
-// http://[::1]:1080/authorize.php?response_type=code&code_challenge_method=S256&scope=eap-metadata&code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM&redirect_uri=http://[::1]:1080/authorize.php&client_id=00000000-0000-0000-0000-000000000000&state=0
+// http://localhost:1080/authorize.php?response_type=code&code_challenge_method=S256&scope=eap-metadata&code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM&redirect_uri=http://localhost:1080/authorize.php&client_id=00000000-0000-0000-0000-000000000000&state=0
 
 // Settings
-$sharedKey = new SymmetricKey( 'YENuGQd3avOLdM8UBxPhRZRxhmQxXR5g' ); // TODO: Give random BITS!
-$user = 'user'; // TODO: Get some login system
-$clients = [
-	'00000000-0000-0000-0000-000000000000' => [
-		'redirect' => ['http://localhost:1080/authorize.php'],
-		'scope' => ['eap-metadata']
-	],
-];
+$sharedKey = LetsWifiApp::getInstance()->getSymmetricKey();
+$user = $_SESSION['oauth_user'];
+$clients = LetsWifiApp::getInstance()->getClients();
 
 header( 'Cache-Control: no-store' );
 header( 'Pragma: no-cache' );
@@ -43,21 +39,21 @@ header( 'Pragma: no-cache' );
 foreach( ['response_type', 'code_challenge_method', 'scope', 'code_challenge', 'redirect_uri', 'client_id', 'state'] as $key ) {
 	if ( !isset($_GET[$key] ) ) {
 		header( 'Content-Type: text/plain', true, 422 );
-		die( "422 Unprocessable Entity\r\n\r\nMissing GET parameter '$key'\r\n\r\n" );
+		die( "422 Unprocessable Entity\r\n\r\nMissing GET parameter '$key'\r\n" );
 	}
 }
 
 if ( $_GET['response_type'] !== 'code' ) {
 	header( 'Content-Type: text/plain', true, 422 );
-	die( "422 Unprocessable Entity\r\n\r\nOnly code is supported as response_type\r\n\r\n" );
+	die( "422 Unprocessable Entity\r\n\r\nOnly code is supported as response_type\r\n" );
 }
 if ( $_GET['code_challenge_method'] !== 'S256' ) {
 	header( 'Content-Type: text/plain', true, 422 );
-	die( "422 Unprocessable Entity\r\n\r\nOnly S256 is supported as code_challenge_method\r\n\r\n" );
+	die( "422 Unprocessable Entity\r\n\r\nOnly S256 is supported as code_challenge_method\r\n" );
 }
 if ( !preg_match( '/^[a-zA-Z0-9_\\-]{43}$/', $_GET['code_challenge'] ) ) {
 	header( 'Content-Type: text/plain', true, 422 );
-	die( "422 Unprocessable Entity\r\n\r\nIllegal code challenge for S256\r\n\r\n" );
+	die( "422 Unprocessable Entity\r\n\r\nIllegal code challenge for S256\r\n" );
 }
 if ( !array_key_exists( $_GET['client_id'], $clients ) ) {
 	header( 'Content-Type: text/plain', true, 403 );
@@ -65,11 +61,11 @@ if ( !array_key_exists( $_GET['client_id'], $clients ) ) {
 }
 if ( !in_array( $_GET['redirect_uri'], $clients[$_GET['client_id']]['redirect'], true ) ) {
 	header( 'Content-Type: text/plain', true, 403 );
-	die( "403 Forbidden\r\n\r\nRequested redirect URI not allowed\r\n\r\n" );
+	die( "403 Forbidden\r\n\r\nRequested redirect URI not allowed\r\n" );
 }
 if ( !in_array( $_GET['scope'], $clients[$_GET['client_id']]['scope'], true ) ) {
 	header( 'Content-Type: text/plain', true, 403 );
-	die( "403 Forbidden\r\n\r\nRequested scope not allowed\r\n\r\n" );
+	die( "403 Forbidden\r\n\r\nRequested scope not allowed\r\n" );
 }
 
 if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
@@ -79,11 +75,11 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
 			->setVersion( new Version2() )
 			->setPurpose( Purpose::local() )
 			->setExpiration(
-				( new DateTime() )->add( new DateInterval( 'PT10M' ) )
+				( new DateTime() )->add( LetsWifiApp::getInstance()->getAuthTokenValidity() )
 			)
 			->setClaims( [
-				'iss' => 'lets-wifi-auth',
-				'aud' => 'lets-wifi-issuer',
+				'iss' => LetsWifiApp::getInstance()->getAuthPrincipal(),
+				'aud' => LetsWifiApp::getInstance()->getIssuerPrincipal(),
 				'sub' => $user,
 				'scope' => $_GET['scope'],
 				'code_challenge_method' => $_GET['code_challenge_method'],
@@ -106,7 +102,7 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
 	}
 	header( 'Content-Type: text/plain' );
 	header( "Location: $url", true, 302 );
-	die( "$url\r\n\r\n" );
+	die( "$url\r\n" );
 }
 ?><!DOCTYPE html>
 <title>Authorize eduroam client</title>

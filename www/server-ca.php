@@ -16,6 +16,8 @@ use Uninett\LetsWifi\X509\DN;
 use Uninett\LetsWifi\X509\KeyConfig;
 use Uninett\LetsWifi\X509\PrivateKey;
 
+use Uninett\LetsWifi\LetsWifiApp;
+
 // Quick 'n dirty proof of concept
 
 if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
@@ -27,7 +29,7 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
 
 	$user = $_POST['user'];
 
-	if ( !in_array( $user, ['admin'], true ) ) {
+	if ( !in_array( $user, LetsWifiApp::getInstance()->getServerAdministratorUsers(), true ) ) {
 		header( 'Content-Type: text/plain', true, 403 );
 		die( "403 Forbidden\r\n\r\nYou are not allowed to receive a server certificate\r\n" );
 	}
@@ -38,11 +40,8 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
 			die( "403 Forbidden\r\n\r\nIllegal user specified\r\n" );
 		}
 
-		$dn = new DN(
+		$dn = new DN( LetsWifiApp::getInstance()->getCertificateSubjectAttributes() +
 				[
-					'countryName' => 'NO',
-					'localityName' => 'Trondheim',
-					'organizationName' => 'UNINETT AS',
 					'commonName' => $_POST['commonName'],
 				]
 			);
