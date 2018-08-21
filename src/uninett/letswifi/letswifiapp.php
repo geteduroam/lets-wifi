@@ -53,7 +53,7 @@ final class LetsWifiApp
 
 	public function getAuthPrincipal(): string
 	{
-		return array_key_exists( 'authPrincipal', $this->config )
+		return \array_key_exists( 'authPrincipal', $this->config )
 			? $this->config['authPrincipal']
 			: 'lets-wifi-auth'
 			;
@@ -61,7 +61,7 @@ final class LetsWifiApp
 
 	public function getIssuerPrincipal(): string
 	{
-		return array_key_exists( 'issuerPrincipal', $this->config )
+		return \array_key_exists( 'issuerPrincipal', $this->config )
 			? $this->config['issuerPrincipal']
 			: 'lets-wifi-issuer'
 			;
@@ -69,7 +69,7 @@ final class LetsWifiApp
 
 	public function getGeneratorPrincipal(): string
 	{
-		return array_key_exists( 'generatorPrincipal', $this->config )
+		return \array_key_exists( 'generatorPrincipal', $this->config )
 			? $this->config['generatorPrincipal']
 			: 'lets-wifi-generator'
 			;
@@ -77,23 +77,23 @@ final class LetsWifiApp
 
 	public function getAuthTokenValidity(): DateInterval
 	{
-		return array_key_exists( 'authTokenValidity', $this->config )
+		return \array_key_exists( 'authTokenValidity', $this->config )
 			? new DateInterval( $this->config['authTokenValidity'] )
-			: new DateInterval( 'PT5M', )
+			: new DateInterval( 'PT5M' )
 			;
 	}
 
 	public function getIdTokenValidity(): DateInterval
 	{
-		return array_key_exists( 'idTokenValidity', $this->config )
+		return \array_key_exists( 'idTokenValidity', $this->config )
 			? new DateInterval( $this->config['idTokenValidity'] )
-			: new DateInterval( 'PT15M', )
+			: new DateInterval( 'PT15M' )
 			;
 	}
 
 	public function getServerAdministratorUsers(): array
 	{
-		return array_key_exists( 'serverAdministratorUsers', $this->config )
+		return \array_key_exists( 'serverAdministratorUsers', $this->config )
 			? $this->config['serverAdministratorUsers']
 			: []
 			;
