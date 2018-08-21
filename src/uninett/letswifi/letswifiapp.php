@@ -15,14 +15,18 @@ use ParagonIE\Paseto\Keys\SymmetricKey;
 
 use League\OAuth2\Client\Provider\GenericProvider;
 
-class LetsWifiApp
+final class LetsWifiApp
 {
-	/** @var self */
+	/** @var ?self */
 	private static $instance;
+
+	/** @var array */
+	private $config;
 
 	public function __construct( array $config = null )
 	{
 		if ( null === $config ) {
+			/** @psalm-suppress UnresolvableInclude */
 			$config = ( require \implode( \DIRECTORY_SEPARATOR, [\dirname( __DIR__, 3 ), 'etc', 'lets-wifi.php'] ) );
 		}
 		$this->config = $config;
@@ -49,32 +53,50 @@ class LetsWifiApp
 
 	public function getAuthPrincipal(): string
 	{
-		return $this->config['authPrincipal'];
+		return array_key_exists( 'authPrincipal', $this->config )
+			? $this->config['authPrincipal']
+			: 'lets-wifi-auth'
+			;
 	}
 
 	public function getIssuerPrincipal(): string
 	{
-		return $this->config['issuerPrincipal'];
+		return array_key_exists( 'issuerPrincipal', $this->config )
+			? $this->config['issuerPrincipal']
+			: 'lets-wifi-issuer'
+			;
 	}
 
 	public function getGeneratorPrincipal(): string
 	{
-		return $this->config['generalPrincipal'];
+		return array_key_exists( 'generatorPrincipal', $this->config )
+			? $this->config['generatorPrincipal']
+			: 'lets-wifi-generator'
+			;
 	}
 
 	public function getAuthTokenValidity(): DateInterval
 	{
-		return new DateInterval( $this->config['authTokenValidity'] );
+		return array_key_exists( 'authTokenValidity', $this->config )
+			? new DateInterval( $this->config['authTokenValidity'] )
+			: new DateInterval( 'PT5M', )
+			;
 	}
 
 	public function getIdTokenValidity(): DateInterval
 	{
-		return new DateInterval( $this->config['idTokenValidity'] );
+		return array_key_exists( 'idTokenValidity', $this->config )
+			? new DateInterval( $this->config['idTokenValidity'] )
+			: new DateInterval( 'PT15M', )
+			;
 	}
 
 	public function getServerAdministratorUsers(): array
 	{
-		return $this->config['serverAdministratorUsers'];
+		return array_key_exists( 'serverAdministratorUsers', $this->config )
+			? $this->config['serverAdministratorUsers']
+			: []
+			;
 	}
 
 	public function getRealm(): string
@@ -87,7 +109,7 @@ class LetsWifiApp
 		return $this->config['certificateSubjectAttributes'];
 	}
 
-	public function getOAuthProvider()
+	public function getOAuthProvider(): GenericProvider
 	{
 		return new GenericProvider( $this->config['oauthProvider'] );
 	}

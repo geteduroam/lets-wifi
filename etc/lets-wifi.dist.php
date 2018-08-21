@@ -3,7 +3,7 @@ return [
 	'symmetricKey'                 => hex2bin('64 character HEX string'),
 	'authPrincipal'                => 'lets-wifi-auth',
 	'issuerPrincipal'              => 'lets-wifi-issuer',
-	'generalPrincipal'             => 'lets-wifi-generator',
+	'generatorPrincipal'           => 'lets-wifi-generator',
 	'authTokenValidity'            => 'PT10M',
 	'idTokenValidity'              => 'PT1H',
 	'serverAdministratorUsers'     => ['admin'],
