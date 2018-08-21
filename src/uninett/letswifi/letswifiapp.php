@@ -9,11 +9,11 @@
 
 namespace Uninett\LetsWifi;
 
+use DateInterval;
+
 use ParagonIE\Paseto\Keys\SymmetricKey;
 
 use League\OAuth2\Client\Provider\GenericProvider;
-
-Use DateInterval;
 
 class LetsWifiApp
 {
@@ -87,7 +87,8 @@ class LetsWifiApp
 		return $this->config['certificateSubjectAttributes'];
 	}
 
-	public function getOAuthProvider() {
+	public function getOAuthProvider()
+	{
 		return new GenericProvider( $this->config['oauthProvider'] );
 	}
 }
