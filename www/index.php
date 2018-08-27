@@ -79,7 +79,7 @@ echo implode("\n", str_split(base64_encode(json_encode([
 			<h1>New account</h1>
 			<p class="lead">
 				Select how long this account must be valid:<br>
-				<input type="number" name="days" value="365" style="width:4em"> days.
+				<input type="number" name="days" value="365" min="1" max="365" style="width:4em"> days.
 			</p>
 			<p class="formats">
 				<span>

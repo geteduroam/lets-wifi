@@ -107,6 +107,11 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
 ?><!DOCTYPE html>
 <html lang="en">
 <title>Authorize eduroam client</title>
+<style type="text/css">
+button {
+	cursor: pointer;
+}
+</style>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <link href="assets/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">

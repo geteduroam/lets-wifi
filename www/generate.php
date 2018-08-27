@@ -87,6 +87,10 @@ if ( ((int)$days) != $days ) {
 	header( 'Content-Type: text/plain', true, 422 );
 	die( "422 Unprocessable Entity\r\n\r\nDays must be integer number\r\n" );
 }
+if ( $days < 1 || $days > 365 ) {
+	header( 'Content-Type: text/plain', true, 422 );
+	die( "422 Unprocessable Entity\r\n\r\nInvalid amount of validity days\r\n" );
+}
 
 try {
 	if ( preg_match( '/^[a-z0-9]$/', $_POST['user'] ) ) {
