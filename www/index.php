@@ -63,7 +63,7 @@ echo implode("\n", str_split(base64_encode(json_encode([
 	<div class="header clearfix">
 		<nav>
 			<ul class="nav nav-pills pull-right">
-				<li role="presentation" class="active"><a href="#">Connect</a></li>
+				<li role="presentation" class="active"><a>Connect</a></li>
 				<li role="presentation"><a href="about.php">About</a></li>
 <?php if (isset($_SESSION['oauth_user'])): ?>
 				<li role="presentation"><a href="logout.php">Logout</a></li>
