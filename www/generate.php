@@ -11,6 +11,7 @@ use Uninett\LetsWifi\Generator\Apple\AppleMobileConfigGenerator;
 use Uninett\LetsWifi\Generator\EapConfig\EapConfigGenerator;
 use Uninett\LetsWifi\Generator\PKCS12\PKCS12ConfigGenerator;
 use Uninett\LetsWifi\Generator\Pem\PemConfigGenerator;
+use Uninett\LetsWifi\Generator\Windows\WindowsConfigGenerator;
 
 use ParagonIE\Paseto\Exception\PasetoException;
 use ParagonIE\Paseto\Parser;
@@ -59,6 +60,8 @@ if ( isset( $_SERVER['HTTP_AUTHORIZATION'] ) ) {
 
 	$user = $token->getSubject();
 	$format = $_REQUEST['format'];
+	$password = uniqid();
+	$days = 365;
 } elseif ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
 	session_start();
 	if ( $_POST['user'] !== $_SESSION['oauth_user'] ) {
@@ -66,16 +69,23 @@ if ( isset( $_SERVER['HTTP_AUTHORIZATION'] ) ) {
 		die( "403 Forbidden\r\n\r\nIllegal user specified\r\n" );
 	}
 
-	if ( !in_array($_POST['format'], ['mobileconfig', 'eap-metadata', 'pkcs12', 'pem']) ) {
+	if ( !in_array($_POST['format'], ['mobileconfig', 'eap-metadata', 'pkcs12', 'pem', 'windows']) ) {
 		header( 'Content-Type: text/plain', true, 422 );
 		die( "422 Unprocessable Entity\r\n\r\nIllegal format specified\r\n" );
 	}
 
 	$user = $_POST['user'];
 	$format = $_POST['format'];
+	$password = empty($_POST['password']) ? uniqid() : $_POST['password'];
+	$days = empty($_POST['days']) ? 365 : $_POST['days'];
 } else {
 	header( 'Content-Type: text/plain', true, 422 );
 	die( "422 Unprocessable Entity\r\n\r\nRequest must be POST and/or have a bearer token\r\n" );
+}
+
+if ( ((int)$days) != $days ) {
+	header( 'Content-Type: text/plain', true, 422 );
+	die( "422 Unprocessable Entity\r\n\r\nDays must be integer number\r\n" );
 }
 
 try {
@@ -107,11 +117,11 @@ try {
 		);
 	$x509 = $ca->sign(
 			$csr,
-			30, /* days */
+			$days,
 			$csrConfigArgs
 		);
 
-	$p12Out = $x509->exportPKCS12WithPrivateKey( 'password' );
+	$p12Out = $x509->exportPKCS12WithPrivateKey( $password );
 
 	if ( $format === 'mobileconfig' ) {
 		header( 'Content-Disposition: attachment; filename="'. $user .'.mobileconfig"' );
@@ -122,7 +132,7 @@ try {
 							$user . '@' . LetsWifiApp::getInstance()->getRealm(), // outer identity
 							[$ca], // CA for server certificate
 							$p12Out, // user credential
-							'password'
+							$password
 						),
 				]
 			);
@@ -135,7 +145,7 @@ try {
 							$user . '@' . LetsWifiApp::getInstance()->getRealm(), // outer identity
 							[$ca], // CA for server certificate
 							$p12Out, // user credential
-							'password'
+							$password
 						),
 				]
 			);
@@ -148,7 +158,7 @@ try {
 							$user . '@' . LetsWifiApp::getInstance()->getRealm(), // outer identity
 							[$ca], // CA for server certificate
 							$p12Out, // user credential
-							'password'
+							$password
 						),
 				]
 			);
@@ -161,7 +171,20 @@ try {
 							$user . '@' . LetsWifiApp::getInstance()->getRealm(), // outer identity
 							[$ca], // CA for server certificate
 							$p12Out, // user credential
-							'password'
+							$password
+						),
+				]
+			);
+	} elseif ( $format === 'windows' ) {
+		header( 'Content-Disposition: attachment; filename="'. $user .'.exe"' );
+		$generator = new WindowsConfigGenerator(
+				new ProfileMetadata( 'eduroam demo', 'Demonstration of eduroam EAP-TLS generation and installation' ),
+				[
+					new EapTlsMethod(
+							$user . '@' . LetsWifiApp::getInstance()->getRealm(), // outer identity
+							[$ca], // CA for server certificate
+							$p12Out, // user credential
+							$password
 						),
 				]
 			);

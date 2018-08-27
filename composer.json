@@ -13,8 +13,10 @@
 		"files": ["src/_autoload.php"]
 	},
 	"require": {
+		"components/jquery": "^3.2",
 		"league/oauth2-client": "^2.3",
-		"paragonie/paseto": "^1.0"
+		"paragonie/paseto": "^1.0",
+		"twitter/bootstrap": "^3.3"
 	},
 	"require-dev": {}
 }

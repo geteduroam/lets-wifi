@@ -105,9 +105,31 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
 	die( "$url\r\n" );
 }
 ?><!DOCTYPE html>
+<html lang="en">
 <title>Authorize eduroam client</title>
 
-<form method="post">
-	<button type="submit" name="approve" value="0">Reject</button>
-	<button type="submit" name="approve" value="1">Approve</button>
-</form>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<link href="assets/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="assets/local/jumbotron-narrow.css" rel="stylesheet">
+
+<div class="container">
+	<div class="header clearfix">
+		<h3 class="text-muted">eduroam</h3>
+	</div>
+
+	<div class="jumbotron">
+		<h1>Authorize client</h1>
+		<p>About to create an eduroam profile</p>
+
+		<form method="post">
+			<p>
+				<button type="submit" name="approve" value="0" class="btn btn-danger">Reject</button>
+				<button type="submit" name="approve" value="1" class="btn btn-success">Approve</button>
+			</p>
+		</form>
+	</div>
+
+	<footer class="footer">
+		<p>Uninett AS</p>
+	</footer>
+</div>
