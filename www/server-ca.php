@@ -28,6 +28,7 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
 	}
 
 	$user = $_POST['user'];
+	$days = $_POST['days'];
 
 	if ( !in_array( $user, LetsWifiApp::getInstance()->getServerAdministratorUsers(), true ) ) {
 		header( 'Content-Type: text/plain', true, 403 );
@@ -35,11 +36,6 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
 	}
 
 	try {
-		if ( preg_match( '/^[a-z0-9]$/', $_POST['user'] ) ) {
-			header( 'Content-Type: text/plain', true, 403 );
-			die( "403 Forbidden\r\n\r\nIllegal user specified\r\n" );
-		}
-
 		$dn = new DN( LetsWifiApp::getInstance()->getCertificateSubjectAttributes() +
 				[
 					'commonName' => $_POST['commonName'],
@@ -63,7 +59,7 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
 			);
 		$x509 = $ca->sign(
 				$csr,
-				90, /* days */
+				$days,
 				$csrConfigArgs
 			);
 
@@ -88,6 +84,10 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
 	<dl>
 		<dt>Username</dt>
 		<dd><input type="text" name="user" value="<?= $_SESSION['oauth_user'] ?>" readonly></dd>
+	</dl>
+	<dl>
+		<dt>Days</dt>
+		<dd><input type="number" name="days" value="90"></dd>
 	</dl>
 	<dl>
 		<dt>Common name</dt>
