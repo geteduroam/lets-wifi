@@ -98,4 +98,37 @@ class CA extends Certificate
 
 		return new Certificate( $result, $csr->getPrivateKey(), \array_merge( [$this], $this->getChain() ) );
 	}
+
+	public static function selfSign( ICSR $csr, int $days, ?IKeyConfig $configArgs = null, int $serial = 0 ): ICertificate
+	{
+		$private = $csr->getPrivateKey();
+
+		if ( null === $configArgs ) {
+			$configArgs = new KeyConfig();
+		}
+
+		OpenSSLException::flushErrorMessages();
+		/**
+		 * Using NULL for the CA certificate, this is valid according to PHP documentation,
+		 * but not according to Psalm.  Suppressing the error.
+		 *
+		 * @see http://php.net/openssl_csr_sign
+		 * @psalm-suppress NullArgument
+		 */
+
+		$result = \openssl_csr_sign(
+				$csr->getResource(), /* CSR */
+				null, /* CA certificate */
+				$private->getResource(), /* CA privkey */
+				$days, /* Days validity */
+				$configArgs->toArray(),
+				$serial
+			);
+
+		if ( false === $result ) {
+			throw new OpenSSLException();
+		}
+
+		return new Certificate( $result, $csr->getPrivateKey() );
+	}
 }
