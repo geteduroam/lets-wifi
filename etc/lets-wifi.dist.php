@@ -20,7 +20,7 @@ return [
 		[
 			'countryName'      => 'NO',
 			'localityName'     => 'Trondheim',
-			'organizationName' => 'UNINETT AS',
+			'organizationName' => 'Uninett AS',
 		],
 	'oauthProvider' =>
 		[

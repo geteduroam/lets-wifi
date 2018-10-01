@@ -1,25 +1,25 @@
 [ req ]
-prompt                  = no
-distinguished_name      = dn
+prompt                 = no
+distinguished_name     = dn
 
 [dn]
 
 [ ca_req ]
-subjectKeyIdentifier    = hash
-authorityKeyIdentifier  = keyid:always, issuer:always
-basicConstraints        = CA:TRUE
-keyUsage                = cRLSign, digitalSignature, keyCertSign
+subjectKeyIdentifier   = hash
+authorityKeyIdentifier = keyid:always, issuer:always
+basicConstraints       = CA:TRUE
+keyUsage               = cRLSign, digitalSignature, keyCertSign
 
 [ client_req ]
-subjectKeyIdentifier    = hash
-authorityKeyIdentifier  = keyid:always, issuer:always
-basicConstraints        = CA:FALSE
-keyUsage                = digitalSignature, nonRepudiation, keyEncipherment
-extendedKeyUsage        = clientAuth
+subjectKeyIdentifier   = hash
+authorityKeyIdentifier = keyid:always, issuer:always
+basicConstraints       = CA:FALSE
+keyUsage               = digitalSignature, nonRepudiation, keyEncipherment
+extendedKeyUsage       = clientAuth
 
 [ server_req ]
-subjectKeyIdentifier    = hash
-authorityKeyIdentifier  = keyid:always, issuer:always
-basicConstraints        = CA:FALSE
-keyUsage                = digitalSignature, nonRepudiation, keyEncipherment, keyAgreement
-extendedKeyUsage        = serverAuth
+subjectKeyIdentifier   = hash
+authorityKeyIdentifier = keyid:always, issuer:always
+basicConstraints       = CA:FALSE
+keyUsage               = digitalSignature, nonRepudiation, keyEncipherment, keyAgreement
+extendedKeyUsage       = serverAuth

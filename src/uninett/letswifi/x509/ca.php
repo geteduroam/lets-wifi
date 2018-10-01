@@ -43,7 +43,7 @@ class CA extends Certificate
 		$this->privKeyFileName = $privKeyFileName;
 
 		parent::__construct(
-				$this->keyToResource( 'file://' . $realWorkingDirectory . \DIRECTORY_SEPARATOR . $pubKeyFileName ),
+				Certificate::keyToResource( 'file://' . $realWorkingDirectory . \DIRECTORY_SEPARATOR . $pubKeyFileName ),
 				PrivateKey::import( 'file://' . $realWorkingDirectory . \DIRECTORY_SEPARATOR . $privKeyFileName, $caPassPhrase )
 			);
 	}
