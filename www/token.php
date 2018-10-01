@@ -28,7 +28,7 @@ $baseUrl = ( empty( $_SERVER['HTTPS'] ) || $_SERVER['HTTPS'] === 'off' ? 'http' 
 header( 'Cache-Control: no-store' );
 header( 'Pragma: no-cache' );
 
-foreach( ['grant_type', 'code', 'redirect_uri', 'client_id', 'code_verifier'] as $key ) {
+foreach( ['grant_type', 'code', 'client_id', 'code_verifier'] as $key ) {
 	if ( !isset( $_GET[$key] ) ) {
 		header( 'Content-Type: text/plain', true, 422 );
 		die( "422 Unprocessable Entity\r\n\r\nMissing GET parameter '$key'\r\n" );
@@ -39,7 +39,7 @@ if ( !array_key_exists( $_GET['client_id'], $clients ) ) {
 	header( 'Content-Type: text/plain', true, 403 );
 	die( "403 Forbidden\r\n\r\nUnknown client ID\r\n" );
 }
-if ( !in_array( $_GET['redirect_uri'], $clients[$_GET['client_id']]['redirect'], true ) ) {
+if ( 'authorization_code' !== $_GET['grant_type'] ) {
 	header( 'Content-Type: text/plain', true, 403 );
 	die( "403 Forbidden\r\n\r\nRequested redirect URI not allowed\r\n" );
 }
