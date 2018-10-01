@@ -27,8 +27,12 @@ class KeyConfig implements IKeyConfig
 	 * @param array $configargs   Array like the argument to openssl_csr_new() with the same name
 	 * @param array $extraattribs Array like the argument to openssl_csr_new() with the same name
 	 */
-	public function __construct( array $configargs, array $extraattribs = [] )
+	public function __construct( array $configargs = [], array $extraattribs = [] )
 	{
+		if ( !\array_key_exists( 'config', $configargs ) ) {
+			$configargs['config'] = __DIR__ . \DIRECTORY_SEPARATOR . 'openssl.cnf';
+		}
+
 		$this->configargs = $configargs;
 		$this->extraattribs = $extraattribs;
 	}
