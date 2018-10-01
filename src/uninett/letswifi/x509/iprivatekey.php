@@ -17,10 +17,10 @@ interface IPrivateKey extends IKey
 	/**
 	 * Export payload as password-protected PEM-encoded string.
 	 */
-	public function exportPEM( string $password ): string;
+	public function exportPEM( string $password, ?IKeyConfig $configArgs = null ): string;
 
 	/**
 	 * Export payload as PEM-encoded string.
 	 */
-	public function exportPEMWithoutPassword(): string;
+	public function exportPEMWithoutPassword( ?IKeyConfig $configArgs = null ): string;
 }

@@ -63,19 +63,16 @@ class CA extends Certificate
 	 *
 	 * @return ICertificate
 	 */
-	public function sign( ICSR $csr, int $days, ?IKeyConfig $configargs = null, int $serial = 0 ): ICertificate
+	public function sign( ICSR $csr, int $days, ?IKeyConfig $configArgs = null, int $serial = 0 ): ICertificate
 	{
 		$private = $this->getPrivateKey();
 		if ( null === $private ) {
 			throw new \RuntimeException( 'The private key for this CA is unknown, signing not possible' );
 		}
 
-		$configArgsArray = null === $configargs
-			? []
-			: $configArgsArray = $configargs->toArray()
-			;
-
-		$configArgsArray['config'] = __DIR__ . \DIRECTORY_SEPARATOR . 'openssl.cnf';
+		if ( null === $configArgs ) {
+			$configArgs = new KeyConfig();
+		}
 
 		$cwd = \getcwd();
 		if ( !\chdir( $this->workingDirectory ) ) {
@@ -88,7 +85,7 @@ class CA extends Certificate
 				$this->getResource(), /* CA certificate */
 				$private->getResource(), /* CA privkey */
 				$days, /* Days validity */
-				$configArgsArray,
+				$configArgs->toArray(),
 				$serial
 			);
 

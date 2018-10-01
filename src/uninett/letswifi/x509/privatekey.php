@@ -61,11 +61,23 @@ class PrivateKey extends AbstractKeyResource implements IPrivateKey
 	}
 
 	/** {@inheritdoc} */
-	public function exportPEMWithoutPassword(): string
+	public function exportPEMWithoutPassword( ?IKeyConfig $configArgs = null ): string
 	{
 		$out = '';
+		if ( null === $configArgs ) {
+			$configArgs = new KeyConfig();
+		}
+
 		OpenSSLException::flushErrorMessages();
-		if ( !\openssl_pkey_export( $this->getResource(), $out ) ) {
+
+		/**
+		 * Using NULL for the password, this is valid according to PHP documentation,
+		 * but not according to Psalm.  Suppressing the error.
+		 *
+		 * @see http://php.net/openssl_pkey_export
+		 * @psalm-suppress NullArgument
+		 */
+		if ( !\openssl_pkey_export( $this->getResource(), $out, null, $configArgs->toArray() ) ) {
 			throw new OpenSSLException();
 		}
 
@@ -73,7 +85,7 @@ class PrivateKey extends AbstractKeyResource implements IPrivateKey
 	}
 
 	/** {@inheritdoc} */
-	public function exportPEM( string $passphrase ): string
+	public function exportPEM( string $passphrase, ?IKeyConfig $configArgs = null ): string
 	{
 		if ( 0 === \strlen( $passphrase ) ) {
 			throw new \InvalidArgumentException( 'Passphrase cannot be empty' );
@@ -81,7 +93,7 @@ class PrivateKey extends AbstractKeyResource implements IPrivateKey
 
 		$out = '';
 		OpenSSLException::flushErrorMessages();
-		if ( \openssl_pkey_export( $this->getResource(), $out, $passphrase ) ) {
+		if ( \openssl_pkey_export( $this->getResource(), $out, $passphrase, $configArgs->toArray() ) ) {
 			throw new OpenSSLException();
 		}
 
