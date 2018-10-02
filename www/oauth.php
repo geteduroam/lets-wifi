@@ -28,6 +28,7 @@ if (!isset($_GET['code'])) {
 		header('Location: ' . $redirect);
 	} catch (\League\OAuth2\Client\Provider\Exception\IdentityProviderException $e) {
 		// Failed to get the access token or user details.
+		header('Content-Type: text/plain', true, 500);
 		exit($e->getMessage());
 	}
 }

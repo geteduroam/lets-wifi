@@ -18,8 +18,9 @@ use Uninett\LetsWifi\LetsWifiApp;
 // Very very proof of concept, NO NOT USE IN PRODUCTION
 
 // Settings
-$sharedKey = LetsWifiApp::getInstance()->getSymmetricKey();
-$clients = LetsWifiApp::getInstance()->getClients();
+$app = LetsWifiApp::getInstance();
+$sharedKey = $app->getSymmetricKey();
+$clients = $app->getClients();
 
 $baseUrl = ( empty( $_SERVER['HTTPS'] ) || $_SERVER['HTTPS'] === 'off' ? 'http' : 'https' )
 	. '://'
@@ -51,8 +52,8 @@ if ( !preg_match( '/^[a-zA-Z0-9_\\-]{43}$/', $_GET['code_verifier'] ) ) {
 $parser = ( new Parser() )
 	->setKey( $sharedKey )
 	->addRule( new NotExpired )
-	->addRule( new IssuedBy( LetsWifiApp::getInstance()->getAuthPrincipal() ) )
-	->addRule( new ForAudience( LetsWifiApp::getInstance()->getIssuerPrincipal() ) )
+	->addRule( new IssuedBy( $app->getAuthPrincipal() ) )
+	->addRule( new ForAudience( $app->getIssuerPrincipal() ) )
 	->setPurpose( Purpose::local() )
 	->setAllowedVersions( ProtocolCollection::v2() );
 
@@ -80,22 +81,21 @@ if ( $verifiedBin !== $challengeBin ) {
 	die( "403 Forbidden\r\n\r\nAccess token does not match\r\n" );
 }
 
-header( 'Content-Type: application/json;charset=UTF-8', true );
-
 $newToken = ( new Builder() )
 	->setKey( $sharedKey )
 	->setVersion( new Version2() )
 	->setPurpose( Purpose::local() )
 	->setExpiration(
-		( new DateTime() )->add( LetsWifiApp::getInstance()->getIdTokenValidity() )
+		( new DateTime() )->add( $app->getIdTokenValidity() )
 	)
 	->setClaims( [
-		'iss' => LetsWifiApp::getInstance()->getIssuerPrincipal(),
-		'aud' => LetsWifiApp::getInstance()->getGeneratorPrincipal(),
+		'iss' => $app->getIssuerPrincipal(),
+		'aud' => $app->getGeneratorPrincipal(),
 		'sub' => $token->getSubject(),
 		'scope' => $token->get( 'scope' ),
 	] );
 
+header( 'Content-Type: application/json;charset=UTF-8', true );
 echo json_encode(
 		[
 			'access_token' => $newToken->toString(),

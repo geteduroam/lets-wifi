@@ -29,9 +29,10 @@ use Uninett\LetsWifi\LetsWifiApp;
 // http://localhost:1080/authorize.php?response_type=code&code_challenge_method=S256&scope=eap-metadata&code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM&redirect_uri=http://localhost:1080/authorize.php&client_id=00000000-0000-0000-0000-000000000000&state=0
 
 // Settings
-$sharedKey = LetsWifiApp::getInstance()->getSymmetricKey();
+$app = LetsWifiApp::getInstance();
+$sharedKey = $app->getSymmetricKey();
 $user = $_SESSION['oauth_user'];
-$clients = LetsWifiApp::getInstance()->getClients();
+$clients = $app->getClients();
 
 header( 'Cache-Control: no-store' );
 header( 'Pragma: no-cache' );
@@ -75,11 +76,11 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
 			->setVersion( new Version2() )
 			->setPurpose( Purpose::local() )
 			->setExpiration(
-				( new DateTime() )->add( LetsWifiApp::getInstance()->getAuthTokenValidity() )
+				( new DateTime() )->add( $app->getAuthTokenValidity() )
 			)
 			->setClaims( [
-				'iss' => LetsWifiApp::getInstance()->getAuthPrincipal(),
-				'aud' => LetsWifiApp::getInstance()->getIssuerPrincipal(),
+				'iss' => $app->getAuthPrincipal(),
+				'aud' => $app->getIssuerPrincipal(),
 				'sub' => $user,
 				'scope' => $_GET['scope'],
 				'code_challenge_method' => $_GET['code_challenge_method'],

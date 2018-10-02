@@ -28,6 +28,8 @@ use Uninett\LetsWifi\LetsWifiApp;
 
 // Quick 'n dirty proof of concept
 
+$app = LetsWifiApp::getInstance();
+
 if ( isset( $_SERVER['HTTP_AUTHORIZATION'] ) ) {
 	$authorization = $_SERVER['HTTP_AUTHORIZATION'];
 	if ( substr( $authorization, 0, 7 ) !== 'Bearer ' ) {
@@ -36,13 +38,13 @@ if ( isset( $_SERVER['HTTP_AUTHORIZATION'] ) ) {
 	}
 	$tokenString = substr( $authorization, 7 );
 
-	$sharedKey = LetsWifiApp::getInstance()->getSymmetricKey();
+	$sharedKey = $app->getSymmetricKey();
 
 	$parser = ( new Parser() )
 		->setKey( $sharedKey )
 		->addRule( new NotExpired )
-		->addRule( new IssuedBy( LetsWifiApp::getInstance()->getIssuerPrincipal() ) )
-		->addRule( new ForAudience( LetsWifiApp::getInstance()->getGeneratorPrincipal() ) )
+		->addRule( new IssuedBy( $app->getIssuerPrincipal() ) )
+		->addRule( new ForAudience( $app->getGeneratorPrincipal() ) )
 		->setPurpose( Purpose::local() )
 		->setAllowedVersions( ProtocolCollection::v2() );
 
@@ -98,9 +100,9 @@ try {
 		die( "403 Forbidden\r\n\r\nIllegal user specified\r\n" );
 	}
 
-	$dn = new DN( LetsWifiApp::getInstance()->getCertificateSubjectAttributes() +
+	$dn = new DN( $app->getCertificateSubjectAttributes() +
 			[
-				'commonName' => $user . '@' . LetsWifiApp::getInstance()->getRealm(),
+				'commonName' => $user . '@' . $app->getRealm(),
 			]
 		);
 
@@ -133,7 +135,7 @@ try {
 				new ProfileMetadata( 'eduroam demo', 'Demonstration of eduroam EAP-TLS generation and installation' ),
 				[
 					new EapTlsMethod(
-							$user . '@' . LetsWifiApp::getInstance()->getRealm(), // outer identity
+							$user . '@' . $app->getRealm(), // outer identity
 							[$ca], // CA for server certificate
 							$p12Out, // user credential
 							$password
@@ -146,7 +148,7 @@ try {
 				new ProfileMetadata( 'eduroam demo', 'Demonstration of eduroam EAP-TLS generation and installation' ),
 				[
 					new EapTlsMethod(
-							$user . '@' . LetsWifiApp::getInstance()->getRealm(), // outer identity
+							$user . '@' . $app->getRealm(), // outer identity
 							[$ca], // CA for server certificate
 							$p12Out, // user credential
 							$password
@@ -159,7 +161,7 @@ try {
 				new ProfileMetadata( 'eduroam demo', 'Demonstration of eduroam EAP-TLS generation and installation' ),
 				[
 					new EapTlsMethod(
-							$user . '@' . LetsWifiApp::getInstance()->getRealm(), // outer identity
+							$user . '@' . $app->getRealm(), // outer identity
 							[$ca], // CA for server certificate
 							$p12Out, // user credential
 							$password
@@ -172,7 +174,7 @@ try {
 				new ProfileMetadata( 'eduroam demo', 'Demonstration of eduroam EAP-TLS generation and installation' ),
 				[
 					new EapTlsMethod(
-							$user . '@' . LetsWifiApp::getInstance()->getRealm(), // outer identity
+							$user . '@' . $app->getRealm(), // outer identity
 							[$ca], // CA for server certificate
 							$p12Out, // user credential
 							$password
@@ -185,7 +187,7 @@ try {
 				new ProfileMetadata( 'eduroam demo', 'Demonstration of eduroam EAP-TLS generation and installation' ),
 				[
 					new EapTlsMethod(
-							$user . '@' . LetsWifiApp::getInstance()->getRealm(), // outer identity
+							$user . '@' . $app->getRealm(), // outer identity
 							[$ca], // CA for server certificate
 							$p12Out, // user credential
 							$password
