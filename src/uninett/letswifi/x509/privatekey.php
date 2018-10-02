@@ -87,6 +87,10 @@ class PrivateKey extends AbstractKeyResource implements IPrivateKey
 	/** {@inheritdoc} */
 	public function exportPEM( string $passphrase, ?IKeyConfig $configArgs = null ): string
 	{
+		if ( null === $configArgs ) {
+			$configArgs = new KeyConfig();
+		}
+
 		if ( 0 === \strlen( $passphrase ) ) {
 			throw new \InvalidArgumentException( 'Passphrase cannot be empty' );
 		}
