@@ -25,14 +25,14 @@ class CA extends Certificate
 	/**
 	 * Load an existing CA
 	 *
-	 * @param string $workingDirectory Directory where the CA, key, index and serial reside
-	 * @param string $pubKeyFileName   Filename of the public key/certificate, must be in $workingDirectory
-	 * @param string $privKeyFileName  Filename of the private key, must be in $workingDirectory
-	 * @param string $caPassPhrase     Passphrase on the private key
+	 * @param string  $workingDirectory Directory where the CA, key, index and serial reside
+	 * @param string  $pubKeyFileName   Filename of the public key/certificate, must be in $workingDirectory
+	 * @param string  $privKeyFileName  Filename of the private key, must be in $workingDirectory
+	 * @param ?string $caPassPhrase     Passphrase on the private key
 	 *
 	 * @throws \RuntimeException $workingDirectory cannot be found, or cannot read one or more of the expected files there
 	 */
-	public function __construct( string $workingDirectory, string $pubKeyFileName, string $privKeyFileName, string $caPassPhrase )
+	public function __construct( string $workingDirectory, string $pubKeyFileName, string $privKeyFileName, ?string $caPassPhrase = null )
 	{
 		$realWorkingDirectory = \realpath( $workingDirectory );
 		if ( false === $realWorkingDirectory ) {

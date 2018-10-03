@@ -42,15 +42,19 @@ class PrivateKey extends AbstractKeyResource implements IPrivateKey
 	 *
 	 * @see http://php.net/manual/en/function.openssl-pkey-get-private.php
 	 *
-	 * @param mixed  $keyMaterial An existing resource, or a PEM formatted key
-	 * @param string $passphrase  Passphrase for the key, if any
+	 * @param mixed   $keyMaterial An existing resource, or a PEM formatted key
+	 * @param ?string $passphrase  Passphrase for the key, if any
 	 *
 	 * @throws OpenSSLException
 	 *
 	 * @return \Uninett\LetsWifi\X509\PrivateKey
 	 */
-	public static function import( $keyMaterial, string $passphrase = '' ): self
+	public static function import( $keyMaterial, ?string $passphrase = null ): self
 	{
+		if ( null === $passphrase ) {
+			$passphrase = '';
+		}
+
 		OpenSSLException::flushErrorMessages();
 		$res = \openssl_pkey_get_private( $keyMaterial, $passphrase );
 		if ( false === $res ) {
