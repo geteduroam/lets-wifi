@@ -1,12 +1,7 @@
-dev:
-	mkdir -p data/ca data/server
-	test -s data/ca/ca.cnf || cp openssl.cnf data/ca/ca.cnf
-	test -s data/server/server.cnf || cp openssl.cnf data/server/server.cnf
-	test -s data/ca/index.txt || touch data/ca/index.txt
-	test -s data/ca/serial || echo 01 >data/ca/serial
-	test -s data/ca/ca.key -a -s data/ca/ca.pem || openssl req -new -x509 -keyout data/ca/ca.key -out data/ca/ca.pem -days 60 -config data/ca/ca.cnf
-	test -s data/server/server.csr -a -s data/server/server.key || openssl req -new  -out data/server/server.csr -keyout data/server/server.key -config data/server/server.cnf
-	test -s data/server/server.crt || { cd data/ca/ ; openssl ca -batch -keyfile ca.key -cert ca.pem -in ../server/server.csr -key whatever -out ../server/server.crt -config ../server/server.cnf; }
+var:
+	php bin/cagen
+
+dev: var
 	php -S [::1]:1080 -t www/
 
 composer.phar:

@@ -116,10 +116,10 @@ try {
 	$csr = new CSR( $dn, $privkey, $csrConfigArgs );
 
 	$ca = new CA(
-			implode( DIRECTORY_SEPARATOR, ['..', 'data', 'ca'] ),
+			$app->getCADirectory(),
 			'ca.pem',
-			'ca.key',
-			'whatever'
+			'ca-key.pem',
+			$app->getCAPassword()
 		);
 	$x509 = $ca->sign(
 			$csr,

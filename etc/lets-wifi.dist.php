@@ -1,5 +1,8 @@
 <?php
 return [
+	'caDirectory'                  => implode( DIRECTORY_SEPARATOR, [ dirname( __DIR__ ), 'var', 'geteduroam-ca' ] ),
+	'caPassword'                   => null,
+
 	'symmetricKey'                 => hex2bin('64 character HEX string'),
 	'authPrincipal'                => 'lets-wifi-auth',
 	'issuerPrincipal'              => 'lets-wifi-issuer',

@@ -113,4 +113,14 @@ final class LetsWifiApp
 	{
 		return new GenericProvider( $this->config['oauthProvider'] );
 	}
+
+	public function getCADirectory(): string
+	{
+		return $this->config['caDirectory'];
+	}
+
+	public function getCAPassword(): ?string
+	{
+		return $this->config['caPassword'];
+	}
 }
