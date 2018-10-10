@@ -1,11 +1,11 @@
+dev: etc/lets-wifi.php var vendor
+	php -S [::1]:1080 -t www/
+
 var:
 	php bin/cagen --days 10 --cn 'lets-wifi development CA'
 
 etc/lets-wifi.php:
 	sed -e 's/64 character HEX string/$(shell base64 /dev/random | tr -Cd '0123456789abcdef' | head -c64)/g' <etc/lets-wifi.dist.php >etc/lets-wifi.php
-
-dev: etc/lets-wifi.php var vendor
-	php -S [::1]:1080 -t www/
 
 composer.phar:
 	curl -sSLO https://getcomposer.org/composer.phar || wget https://getcomposer.org/composer.phar
