@@ -79,6 +79,12 @@ class CA extends Certificate
 			throw new \RuntimeException( 'Unable to chdir to CA working directory' );
 		}
 
+		if ( 0 === $serial ) {
+			$serial = time() * 1000;
+			$millis = (int) substr( microtime(), 2, 6 );
+			$serial += $millis;
+		}
+
 		OpenSSLException::flushErrorMessages();
 		$result = \openssl_csr_sign(
 				$csr->getResource(), /* CSR */
