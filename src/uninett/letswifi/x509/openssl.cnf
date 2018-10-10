@@ -7,7 +7,7 @@ distinguished_name     = dn
 [ ca_req ]
 subjectKeyIdentifier   = hash
 authorityKeyIdentifier = keyid:always, issuer:always
-basicConstraints       = CA:TRUE
+basicConstraints       = critical, CA:TRUE
 keyUsage               = cRLSign, digitalSignature, keyCertSign
 
 [ client_req ]

@@ -1,6 +1,6 @@
 /composer.phar
 /etc/lets-wifi.php
-/data
+/var
 /phpdoc
 /php-cs-fixer-v2.phar
 /phpDocumentor.phar

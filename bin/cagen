@@ -1,0 +1,77 @@
+#!/usr/bin/env php
+<?php require implode( DIRECTORY_SEPARATOR, [dirname( __DIR__ ), 'src', '_autoload.php'] );
+
+use Uninett\LetsWifi\X509\CA;
+use Uninett\LetsWifi\X509\CSR;
+use Uninett\LetsWifi\X509\DN;
+use Uninett\LetsWifi\X509\KeyConfig;
+use Uninett\LetsWifi\X509\PrivateKey;
+
+use Uninett\LetsWifi\LetsWifiApp;
+
+// Quick 'n dirty proof of concept
+
+$app = LetsWifiApp::getInstance();
+
+$cn = null;
+$days = null;
+$pass = $app->getCAPassword();
+
+function help() {
+	global $argv;
+	echo "Usage: $argv[0] --cn COMMON_NAME --days DAYS [ --pass PASSWORD ]\n";
+	exit(2);
+}
+
+for( $i = 1; $i < $argc; $i++ ) {
+	switch( $argv[$i] ) {
+		case '--cn': $cn = $argv[++$i];break;
+		case '--days': $days = $argv[++$i];break;
+		case '--pass': $pass = $argv[++$i];break;
+		default: help();
+	}
+}
+
+$keyFile = $app->getCADirectory() . DIRECTORY_SEPARATOR . 'ca-key.pem';
+$crtFile = $app->getCADirectory() . DIRECTORY_SEPARATOR . 'ca.pem';
+
+if ( file_exists( $keyFile ) || file_exists ( $crtFile) ) {
+	echo 'A CA already exists in ' . $app->getCADirectory() . "\n";
+	exit(1);
+}
+
+if ( null === $cn || null === $days ) {
+	help();
+}
+
+$dn = new DN( $app->getCertificateSubjectAttributes() +
+		[
+			'commonName' => $cn,
+		]
+	);
+
+$privkey = PrivateKey::generate( new KeyConfig(
+		[
+			'private_key_bits' => 2048,
+			'private_key_type' => OPENSSL_KEYTYPE_RSA,
+		]
+	) );
+$csrConfigArgs = new KeyConfig( ['digest_alg' => 'sha256', 'x509_extensions' => 'ca_req'] );
+$csr = new CSR( $dn, $privkey, $csrConfigArgs );
+
+$x509 = CA::selfSign(
+		$csr,
+		$days,
+		$csrConfigArgs
+	);
+
+if ( null === $pass ) {
+	$privPem = $x509->getPrivateKey()->exportPEMWithoutPassword();
+} else {
+	$privPem = $x509->getPrivateKey()->exportPEM( $pass );
+}
+$pubPem = $x509->getPEMBytes( false );
+
+is_dir( $app->getCADirectory() ) or mkdir( $app->getCADirectory(), 0700, true );
+file_put_contents( $keyFile, $privPem );
+file_put_contents( $crtFile, $pubPem );

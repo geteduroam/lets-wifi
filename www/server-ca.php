@@ -52,10 +52,10 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
 		$csr = new CSR( $dn, $privkey, $csrConfigArgs );
 
 		$ca = new CA(
-				implode( DIRECTORY_SEPARATOR, ['..', 'data', 'ca'] ),
+				implode( DIRECTORY_SEPARATOR, ['..', 'var', 'geteduroam-ca'] ),
 				'ca.pem',
-				'ca.key',
-				'whatever'
+				'ca-key.pem',
+				NULL
 			);
 		$x509 = $ca->sign(
 				$csr,
