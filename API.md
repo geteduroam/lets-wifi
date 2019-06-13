@@ -4,7 +4,7 @@ The server on demo.eduroam.no can be accessed directly by a user, where he is re
 
 ## Discovery
 
-For discovery, use the CAT API, which can be found on https://github.com/GEANT/CAT/blob/master/tutorials/UserAPI.md
+For discovery, use the CAT API, which can be found on https://github.com/GEANT/CAT/blob/v2.0.1/tutorials/UserAPI.md
 If a profile returns a redirect to a URL which ends in #letswifi, retrieve that URL from within your application, and find everything between `-----BEGIN LETSWIFI BLOCK-----` and `-----END LETSWIFI BLOCK-----`.  You will find a base64 encoded string, which is an encoded JSON document.  It is a dictionary with three keys: `authorization_endpoint`, `token_endpoint` and `generator_endpoint`.
 
 ## Authorization endpoint
