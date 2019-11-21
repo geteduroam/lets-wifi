@@ -143,7 +143,7 @@ try {
 				]
 			);
 	} elseif ( $format === 'eap-metadata' ) {
-		header( 'Content-Disposition: attachment; filename="'. $user .'.xml"' );
+		header( 'Content-Disposition: attachment; filename="'. $user .'.eap-config"' );
 		$generator = new EapConfigGenerator(
 				new ProfileMetadata( 'eduroam demo', 'Demonstration of eduroam EAP-TLS generation and installation' ),
 				[
