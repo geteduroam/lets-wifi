@@ -32,6 +32,15 @@ class EapConfigGenerator extends AbstractProfileGenerator
 		}
 		$result .= ''
 			. "\r\n" . '</AuthenticationMethods>'
+			. "\r\n" . '<CredentialApplicability>'
+			. "\r\n" . '<IEEE80211>'
+			. "\r\n" . '<SSID>eduroam</SSID>'
+			. "\r\n" . '<MinRSNProto>CCMP</MinRSNProto>'
+			. "\r\n" . '</IEEE80211>'
+			. "\r\n" . '<IEEE80211>'
+			. "\r\n" . '<ConsortiumOID>001bc50460</ConsortiumOID>'
+			. "\r\n" . '</IEEE80211>'
+			. "\r\n" . '</CredentialApplicability>'
 			. "\r\n" . '<ProviderInfo>'
 			. "\r\n" . '<DisplayName>' . \htmlspecialchars( $this->metadata->getDisplayName() ) . '</DisplayName>'
 			. "\r\n";
