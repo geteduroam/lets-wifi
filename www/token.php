@@ -15,6 +15,16 @@ use ParagonIE\Paseto\Rules\{
 
 use Uninett\LetsWifi\LetsWifiApp;
 
+function oautherror($error_description, $error = 'invalid_request', $error_uri = null) {
+	$result = ['error' => $error, 'error_description' => $error_description];
+	if ( null !== $error_uri ) {
+		$result['error_uri'] = $error_uri;
+	}
+
+	header( 'Content-Type: application/json', true, 400 );
+	die( json_encode( $result, JSON_PRETTY_PRINT ) );
+}
+
 // Very very proof of concept, NO NOT USE IN PRODUCTION
 
 // Settings
@@ -37,15 +47,13 @@ if ( $_SERVER['REQUEST_METHOD'] !== 'POST' ) {
 	$required = ['grant_type', 'code', 'client_id', 'code_verifier'];
 
 	// @TODO activate these lines
-	// header( 'Content-Type: text/plain', true, 400 );
-	// die( "400 Bad Request\r\n\r\nToken must be obtained through POST request\r\n" );
+	// oautherror( 'Token must be obtained through POST request' );
 }
 // @TODO inline $required as soon the conditionals are gone
 foreach( $required as $key ) {
 	// @TODO remove $_GET check, only accept $_POST
 	if ( !isset( $_GET[$key] ) && !isset( $_POST[$key] ) ) {
-		header( 'Content-Type: text/plain', true, 400 );
-		die( "400 Bad Request\r\n\r\nMissing POST parameter '$key'\r\n" );
+		oautherror( "Missing POST parameter '$key'" );
 	}
 	// @TODO remove this
 	if ( !isset( $_POST[$key] ) ) {
@@ -54,23 +62,19 @@ foreach( $required as $key ) {
 }
 
 if ( 'authorization_code' !== $_POST['grant_type'] ) {
-	header( 'Content-Type: text/plain', true, 400 );
-	die( "400 Bad Request\r\n\r\ngrant_type must be \"authorization_code\"\r\n" );
+	oautherror( 'grant_type must be \"authorization_code\"', 'unsupported_grant_type' );
 }
 if ( !preg_match( '/^[a-zA-Z0-9\\-\\._~]{43,128}$/', $_POST['code_verifier'] ) ) {
-	header( 'Content-Type: text/plain', true, 400 );
-	die( "400 Bad Request\r\n\r\ncode_verifier must be 43-128 bytes and only contain alphanumeric and -._~\r\n" );
+	oautherror( 'code_verifier must be 43-128 bytes and only contain alphanumeric and -._~\r\n' );
 }
 
 if ( !array_key_exists( $_POST['client_id'], $clients ) ) {
-	header( 'Content-Type: text/plain', true, 403 );
-	die( "403 Forbidden\r\n\r\nUnknown client ID\r\n" );
+	oautherror( 'Unknown client ID', 'invalid_client' );
 }
 // @TODO remove isset check when POST is enforced
 if ( isset( $_POST['redirect_uri'] ) ) {
 	if ( in_array( $_POST['redirect_uri'], $clients[$_POST['client_id']]['redirect'] ) ) {
-		header( 'Content-Type: text/plain', true, 422 );
-		die( "422 Unprocessable Entity\r\n\r\nProvided redirect_uri is not allowed for the provided client_id\r\n" );
+		oautherror( 'Provided redirect_uri is not allowed for the provided client_id', 'invalid_client' );
 	}
 }
 
@@ -85,13 +89,11 @@ $parser = ( new Parser() )
 try {
 	$token = $parser->parse( $_POST['code'] );
 } catch ( PasetoException $ex ) {
-	header( 'Content-Type: text/plain', true, 422 );
-	die( "422 Unprocessable Entity\r\n\r\nCannot process token\r\n" );
+	oautherror( 'Cannot process token' );
 }
 
 if ($token->get( 'code_challenge_method' ) !== 'S256' ) {
-	header( 'Content-Type: text/plain', true, 422 );
-	die( "422 Unprocessable Entity\r\n\r\nToken has no valid code_challenge_method\r\n" );
+	oautherror( 'Token has no valid code_challenge_method' );
 }
 
 // For this PoC we won't be using constant time
@@ -102,8 +104,7 @@ $verifierBin = base64_decode( strtr( $verifierB64, '_-', '/+' ) );
 $verifiedBin = hash( 'sha256', $verifierB64, true );
 
 if ( $verifiedBin !== $challengeBin ) {
-	header( 'Content-Type: text/plain', true, 403 );
-	die( "403 Forbidden\r\n\r\nAccess token does not match\r\n" );
+	oautherror( 'code_verifier does not solve code_challenge', 'invalid_grant' );
 }
 
 $newToken = ( new Builder() )
