@@ -73,7 +73,7 @@ if ( !array_key_exists( $_POST['client_id'], $clients ) ) {
 }
 // @TODO remove isset check when POST is enforced
 if ( isset( $_POST['redirect_uri'] ) ) {
-	if ( in_array( $_POST['redirect_uri'], $clients[$_POST['client_id']]['redirect'] ) ) {
+	if ( !in_array( $_POST['redirect_uri'], $clients[$_POST['client_id']]['redirect'] ) ) {
 		oautherror( 'Provided redirect_uri is not allowed for the provided client_id', 'invalid_client' );
 	}
 }
