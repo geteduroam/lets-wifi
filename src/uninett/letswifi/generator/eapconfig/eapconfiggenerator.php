@@ -105,6 +105,7 @@ class EapConfigGenerator extends AbstractProfileGenerator
 		foreach ( $authentication->getCACertificates() as $ca ) {
 			$result .= ''
 				. "\r\n" . '<CA format="X.509" encoding="base64">' . \base64_encode( $ca->getPEMBytes() ) . '</CA>'
+				. "\r\n" . '<ServerID>geteduroam.no server CA</ServerID>'
 				. "\r\n";
 		}
 		// @TODO server names
