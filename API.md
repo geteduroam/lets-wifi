@@ -16,9 +16,9 @@ and add the following GET parameters:
   * `code_challenge_method` (set to `S256`)
   * `scope` (choose between `eap-metadata` and `mobileconfig`)
   * `code_challenge` (a code challenge, as documented in RFC7636 section 4)
-  * `redirect_url` (where the user should be redirected after accepting or rejecting your application, GET parameters will added to this URL by the server)
+  * `redirect_uri` (where the user should be redirected after accepting or rejecting your application, GET parameters will added to this URL by the server)
   * `client_id` (your client ID as known by the server)
-  * `state` (a random string that will be set in a GET parameter to the `redirect_url`, for you to verify it's the same flow)
+  * `state` (a random string that will be set in a GET parameter to the `redirect_uri`, for you to verify it's the same flow)
 
 You have created a URL, for example:
 
@@ -41,22 +41,28 @@ Depending on the platform, you may also return code to trigger a return to the a
 The token endpoint requires a `code`, which you obtain via the Authorization endpoint.
 Use the `token_endpoint` string from the discovery.
 
-You need the following GET parameters:
+You need the following POST parameters:
 
-	* `grant_type` (set to `authorization_code`)
-	* `code` (the code received from the authorization endpoint)
-	* `code_verifier` (a code verifier, as documented in RFC7636 section 4)
+  * `grant_type` (set to `authorization_code`)
+  * `code` (the code received from the authorization endpoint)
+  * `redirect_uri` (repeat the value used in the previous request, as mandated by RFC7636)
+  * `client_id` (repeat the value used in the previous request, as mandated by RFC7636)
+  * `code_verifier` (a code verifier, as documented in RFC7636 section 4)
 
 You get back a JSON dictionary, containing the following keys:
 
-	* `access_token`
-	* `token_type` (set to `Bearer`)
-	* `expires_in` (validity of the `access_token` in seconds)
+  * `access_token`
+  * `token_type` (set to `Bearer`)
+  * `expires_in` (validity of the `access_token` in seconds)
 
 Example HTTP conversation
 
-	GET /token.php?grant_type=authorization_code&code=v2.local.AAAAAA&code_verifier=dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk HTTP/1.1
+	POST /token.php HTTP/1.1
 	Accept: application/json
+	Content-Type: application/x-www-form-urlencoded
+	Content-Length: 204
+
+	grant_type=authorization_code&code=v2.local.AAAAAA&redirect_uri=http://localhost:1080/authorize.php&client_id=00000000-0000-0000-0000-000000000000&code_verifier=dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk
 
 	HTTP/1.1 200 OK
 	Cache-Control: no-store

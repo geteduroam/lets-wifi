@@ -29,24 +29,49 @@ $baseUrl = ( empty( $_SERVER['HTTPS'] ) || $_SERVER['HTTPS'] === 'off' ? 'http' 
 header( 'Cache-Control: no-store' );
 header( 'Pragma: no-cache' );
 
-foreach( ['grant_type', 'code', 'client_id', 'code_verifier'] as $key ) {
-	if ( !isset( $_GET[$key] ) ) {
-		header( 'Content-Type: text/plain', true, 422 );
-		die( "422 Unprocessable Entity\r\n\r\nMissing GET parameter '$key'\r\n" );
+// @TODO require redirect_uri
+// @TODO do not support GET
+$required = ['grant_type', 'code', 'redirect_uri', 'client_id', 'code_verifier'];
+if ( $_SERVER['REQUEST_METHOD'] !== 'POST' ) {
+	// @TODO remove this line
+	$required = ['grant_type', 'code', 'client_id', 'code_verifier'];
+
+	// @TODO activate these lines
+	// header( 'Content-Type: text/plain', true, 400 );
+	// die( "400 Bad Request\r\n\r\nToken must be obtained through POST request\r\n" );
+}
+// @TODO inline $required as soon the conditionals are gone
+foreach( $required as $key ) {
+	// @TODO remove $_GET check, only accept $_POST
+	if ( !isset( $_GET[$key] ) && !isset( $_POST[$key] ) ) {
+		header( 'Content-Type: text/plain', true, 400 );
+		die( "400 Bad Request\r\n\r\nMissing POST parameter '$key'\r\n" );
+	}
+	// @TODO remove this
+	if ( !isset( $_POST[$key] ) ) {
+		$_POST[$key] = $_GET[$key];
 	}
 }
 
-if ( !array_key_exists( $_GET['client_id'], $clients ) ) {
+if ( 'authorization_code' !== $_POST['grant_type'] ) {
+	header( 'Content-Type: text/plain', true, 400 );
+	die( "400 Bad Request\r\n\r\ngrant_type must be \"authorization_code\"\r\n" );
+}
+if ( !preg_match( '/^[a-zA-Z0-9\\-\\._~]{43,128}$/', $_POST['code_verifier'] ) ) {
+	header( 'Content-Type: text/plain', true, 400 );
+	die( "400 Bad Request\r\n\r\ncode_verifier must be 43-128 bytes and only contain alphanumeric and -._~\r\n" );
+}
+
+if ( !array_key_exists( $_POST['client_id'], $clients ) ) {
 	header( 'Content-Type: text/plain', true, 403 );
 	die( "403 Forbidden\r\n\r\nUnknown client ID\r\n" );
 }
-if ( 'authorization_code' !== $_GET['grant_type'] ) {
-	header( 'Content-Type: text/plain', true, 403 );
-	die( "403 Forbidden\r\n\r\nRequested redirect URI not allowed\r\n" );
-}
-if ( !preg_match( '/^[a-zA-Z0-9_\\-]{43}$/', $_GET['code_verifier'] ) ) {
-	header( 'Content-Type: text/plain', true, 422 );
-	die( "422 Unprocessable Entity\r\n\r\nIllegal code verifier for S256\r\n" );
+// @TODO remove isset check when POST is enforced
+if ( isset( $_POST['redirect_uri'] ) ) {
+	if ( in_array( $_POST['redirect_uri'], $clients[$_POST['client_id']]['redirect'] ) ) {
+		header( 'Content-Type: text/plain', true, 422 );
+		die( "422 Unprocessable Entity\r\n\r\nProvided redirect_uri is not allowed for the provided client_id\r\n" );
+	}
 }
 
 $parser = ( new Parser() )
@@ -58,7 +83,7 @@ $parser = ( new Parser() )
 	->setAllowedVersions( ProtocolCollection::v2() );
 
 try {
-	$token = $parser->parse( $_GET['code'] );
+	$token = $parser->parse( $_POST['code'] );
 } catch ( PasetoException $ex ) {
 	header( 'Content-Type: text/plain', true, 422 );
 	die( "422 Unprocessable Entity\r\n\r\nCannot process token\r\n" );
@@ -71,7 +96,7 @@ if ($token->get( 'code_challenge_method' ) !== 'S256' ) {
 
 // For this PoC we won't be using constant time
 $challengeB64 = $token->get( 'code_challenge' );
-$verifierB64 = $_GET['code_verifier'];
+$verifierB64 = $_POST['code_verifier'];
 $challengeBin = base64_decode( strtr( $challengeB64, '_-', '/+' ) );
 $verifierBin = base64_decode( strtr( $verifierB64, '_-', '/+' ) );
 $verifiedBin = hash( 'sha256', $verifierB64, true );
