@@ -49,6 +49,12 @@ if ( $_SERVER['REQUEST_METHOD'] !== 'POST' ) {
 	// @TODO activate these lines
 	// oautherror( 'Token must be obtained through POST request' );
 }
+// @TODO Remove the condition
+if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
+	if ( !isset( $_SERVER['CONTENT_TYPE'] ) || $_SERVER['CONTENT_TYPE'] !== 'application/x-www-form-urlencoded' ) {
+		oautherror( 'Invalid Content-Type provided, must be application/x-www-form-urlencoded' );
+	}
+}
 // @TODO inline $required as soon the conditionals are gone
 foreach( $required as $key ) {
 	// @TODO remove $_GET check, only accept $_POST
