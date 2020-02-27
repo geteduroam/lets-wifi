@@ -39,31 +39,15 @@ $baseUrl = ( empty( $_SERVER['HTTPS'] ) || $_SERVER['HTTPS'] === 'off' ? 'http' 
 header( 'Cache-Control: no-store' );
 header( 'Pragma: no-cache' );
 
-// @TODO require redirect_uri
-// @TODO do not support GET
-$required = ['grant_type', 'code', 'redirect_uri', 'client_id', 'code_verifier'];
 if ( $_SERVER['REQUEST_METHOD'] !== 'POST' ) {
-	// @TODO remove this line
-	$required = ['grant_type', 'code', 'client_id', 'code_verifier'];
-
-	// @TODO activate these lines
-	// oautherror( 'Token must be obtained through POST request' );
+	oautherror( 'Token must be obtained through POST request' );
 }
-// @TODO Remove the condition
-if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
-	if ( !isset( $_SERVER['CONTENT_TYPE'] ) || $_SERVER['CONTENT_TYPE'] !== 'application/x-www-form-urlencoded' ) {
-		oautherror( 'Invalid Content-Type provided, must be application/x-www-form-urlencoded' );
-	}
+if ( !isset( $_SERVER['CONTENT_TYPE'] ) || $_SERVER['CONTENT_TYPE'] !== 'application/x-www-form-urlencoded' ) {
+	oautherror( 'Invalid Content-Type provided, must be application/x-www-form-urlencoded' );
 }
-// @TODO inline $required as soon the conditionals are gone
-foreach( $required as $key ) {
-	// @TODO remove $_GET check, only accept $_POST
-	if ( !isset( $_GET[$key] ) && !isset( $_POST[$key] ) ) {
-		oautherror( "Missing POST parameter '$key'" );
-	}
-	// @TODO remove this
+foreach( ['grant_type', 'code', 'redirect_uri', 'client_id', 'code_verifier'] as $key ) {
 	if ( !isset( $_POST[$key] ) ) {
-		$_POST[$key] = $_GET[$key];
+		oautherror( "Missing POST parameter '$key'" );
 	}
 }
 
@@ -73,15 +57,11 @@ if ( 'authorization_code' !== $_POST['grant_type'] ) {
 if ( !preg_match( '/^[a-zA-Z0-9\\-\\._~]{43,128}$/', $_POST['code_verifier'] ) ) {
 	oautherror( 'code_verifier must be 43-128 bytes and only contain alphanumeric and -._~\r\n' );
 }
-
 if ( !array_key_exists( $_POST['client_id'], $clients ) ) {
 	oautherror( 'Unknown client ID', 'invalid_client' );
 }
-// @TODO remove isset check when POST is enforced
-if ( isset( $_POST['redirect_uri'] ) ) {
-	if ( !in_array( $_POST['redirect_uri'], $clients[$_POST['client_id']]['redirect'] ) ) {
-		oautherror( 'Provided redirect_uri is not allowed for the provided client_id', 'invalid_client' );
-	}
+if ( !in_array( $_POST['redirect_uri'], $clients[$_POST['client_id']]['redirect'] ) ) {
+	oautherror( 'Provided redirect_uri is not allowed for the provided client_id', 'invalid_client' );
 }
 
 $parser = ( new Parser() )
