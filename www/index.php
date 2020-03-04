@@ -120,7 +120,7 @@ echo implode("\n", str_split(base64_encode(json_encode([
 				</button>
 			</p>
 			<hr>
-			<p><small>Alternatively, <a href="app/EduroamApp.exe">download the generic Windows app</a></small></p>
+			<p><small>Alternatively, <a href="app/geteduroam.exe">download the generic Windows app</a></small></p>
 		</div>
 
 		<div class="modal fade" id="password-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -155,7 +155,7 @@ echo implode("\n", str_split(base64_encode(json_encode([
 			</a>
 		</p>
 		<hr>
-		<p><small>Alternatively, <a href="app/EduroamApp.exe">download the generic Windows app</a></small></p>
+		<p><small>Alternatively, <a href="app/geteduroam.exe">download the generic Windows app</a></small></p>
 	</div>
 
 <?php endif; ?>
