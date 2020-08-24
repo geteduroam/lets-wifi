@@ -70,7 +70,7 @@ Example HTTP conversation
 	Pragma: no-cache
 
 	{
-		"access_token": "v2.local.AAAAA==",
+		"access_token": "v2.local.AAAAA…==",
 		"token_type": "Bearer",
 		"expires_in": 3600
 	}
