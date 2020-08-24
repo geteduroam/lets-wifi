@@ -81,8 +81,13 @@ Example HTTP conversation
 The generator requires an access_token, as bearer.  You've obtained this from the token endpoint.
 For the URL to the generator, use the `generator_endpoint` string from the discovery.
 
-	GET /generate.php?format=eap-metadata HTTP/1.1
-	Authorization: Bearer AAAAAA==
+	POST /generate.php? HTTP/1.1
+	Accept: application/x-eap-config
+	Authorization: Bearer AAAAAA…==
+	Content-Type: application/x-www-form-urlencoded
+	Content-Length: 19
+
+	format=eap-metadata
 
 	HTTP/1.1 200 OK
 	Cache-Control: no-store
